@@ -16,6 +16,7 @@ import {
   FileText,
   ScrollText,
   Brain,
+  FolderPlus,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
@@ -37,11 +38,13 @@ type Transcript = {
   error: string | null;
   call_kind: "project" | "direct" | "circle";
   project_id: string | null;
+  decisions: string[] | null;
+  next_steps: Array<{ title: string; owner?: string; due_hint?: string; priority?: string }> | null;
 };
 
 type ActionItem = {
   id: string;
-  kind: "task" | "credit" | "note" | "followup" | "decision";
+  kind: "task" | "credit" | "note" | "followup" | "decision" | "studio";
   title: string;
   detail: string | null;
   assignee_name: string | null;
@@ -60,6 +63,7 @@ const KIND_META: Record<ActionItem["kind"], { label: string; icon: any; color: s
   decision: { label: "Decision",  icon: CheckCircle2, color: "bg-emerald-500/15 text-emerald-600" },
   followup: { label: "Follow-up", icon: ScrollText, color: "bg-primary/15 text-primary" },
   note:     { label: "Note",      icon: FileText,   color: "bg-muted text-muted-foreground" },
+  studio:   { label: "New Studio", icon: FolderPlus, color: "bg-[hsl(var(--energy)/0.15)] text-[hsl(var(--energy))]" },
 };
 
 export const CallRecapSheet = ({ open, onOpenChange, transcriptId }: Props) => {
@@ -80,7 +84,7 @@ export const CallRecapSheet = ({ open, onOpenChange, transcriptId }: Props) => {
         supabase.from("call_action_items").select("*").eq("transcript_id", transcriptId).order("created_at"),
       ]);
       if (!mounted) return;
-      setT((tRow as Transcript) ?? null);
+      setT((tRow as unknown as Transcript) ?? null);
       setItems((aRows as ActionItem[]) ?? []);
       setLoading(false);
     };
@@ -120,7 +124,8 @@ export const CallRecapSheet = ({ open, onOpenChange, transcriptId }: Props) => {
       toast({
         title: "Added",
         description:
-          data?.pushed_to_kind === "project_tasks" ? "Task created in this project."
+          data?.pushed_to_kind === "projects" ? "New Studio created from this call."
+          : data?.pushed_to_kind === "project_tasks" ? "Task created in this project."
           : data?.pushed_to_kind === "project_notes" ? "Note saved to this project."
           : "Marked as actioned.",
       });
@@ -268,7 +273,9 @@ export const CallRecapSheet = ({ open, onOpenChange, transcriptId }: Props) => {
                                   >
                                     {pushingId === item.id ? (
                                       <Loader2 className="h-3 w-3 animate-spin" />
-                                    ) : item.kind === "task" ? "Add to project" : "Save"}
+                                    ) : item.kind === "task" ? "Add to project"
+                                      : item.kind === "studio" ? "Create Studio"
+                                      : "Save"}
                                   </Button>
                                   <Button
                                     size="sm"
@@ -292,9 +299,58 @@ export const CallRecapSheet = ({ open, onOpenChange, transcriptId }: Props) => {
 
             <TabsContent value="summary" className="flex-1 min-h-0 m-0">
               <ScrollArea className="h-full px-4 py-3">
-                <p className="text-sm leading-relaxed whitespace-pre-wrap pb-6">
-                  {t.summary ?? "No summary available."}
-                </p>
+                <div className="space-y-5 pb-6">
+                  <section>
+                    <h3 className="mb-1 text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                      What happened
+                    </h3>
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                      {t.summary ?? "No summary available."}
+                    </p>
+                  </section>
+
+                  {!!t.decisions?.length && (
+                    <section>
+                      <h3 className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                        Decisions
+                      </h3>
+                      <ul className="space-y-1.5">
+                        {t.decisions.map((d, i) => (
+                          <li key={i} className="flex gap-2 text-sm leading-snug">
+                            <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[hsl(var(--energy))]" />
+                            <span>{d}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                  )}
+
+                  {!!t.next_steps?.length && (
+                    <section>
+                      <h3 className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                        Suggested next steps
+                      </h3>
+                      <ul className="space-y-1.5">
+                        {t.next_steps.map((n, i) => (
+                          <li key={i} className="rounded-lg border p-2.5">
+                            <p className="text-sm font-medium leading-snug">{n.title}</p>
+                            <div className="mt-1 flex flex-wrap gap-1.5">
+                              {n.owner && (
+                                <Badge variant="outline" className="h-4 px-1.5 text-[10px]">{n.owner}</Badge>
+                              )}
+                              {n.due_hint && (
+                                <Badge variant="outline" className="h-4 px-1.5 text-[10px]">{n.due_hint}</Badge>
+                              )}
+                              {n.priority && (
+                                <Badge variant="secondary" className="h-4 px-1.5 text-[10px]">{n.priority}</Badge>
+                              )}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                  )}
+                </div>
               </ScrollArea>
             </TabsContent>
 

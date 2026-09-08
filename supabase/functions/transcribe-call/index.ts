@@ -45,6 +45,23 @@ serve(async (req) => {
     if (!DAILY_API_KEY) throw new Error("DAILY_API_KEY missing");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY missing");
 
+    // Consent gate — the host can switch Kreto off for a call. When off we
+    // never download the recording, never transcribe, and store nothing.
+    const { data: consentRow } = await admin
+      .from("call_transcripts")
+      .select("kreto_enabled")
+      .eq("id", transcript_id)
+      .maybeSingle();
+    if (consentRow && consentRow.kreto_enabled === false) {
+      await admin
+        .from("call_transcripts")
+        .update({ status: "ready", summary: null, transcript: null })
+        .eq("id", transcript_id);
+      return new Response(JSON.stringify({ ok: true, skipped: "kreto_disabled" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     await admin.from("call_transcripts").update({ status: "transcribing" }).eq("id", transcript_id);
 
     // 1. Get a fresh download link (Daily access links expire ~120s).
@@ -187,6 +204,44 @@ serve(async (req) => {
                       additionalProperties: false,
                     },
                   },
+                  decisions: {
+                    type: "array",
+                    description: "Clear decisions made on the call, in the words used. Empty if nothing was actually decided — never invent one.",
+                    items: { type: "string" },
+                  },
+                  next_steps: {
+                    type: "array",
+                    description: "3-6 concrete next steps the team should take after this call, ordered by urgency.",
+                    items: {
+                      type: "object",
+                      properties: {
+                        title: { type: "string", description: "Imperative next step (max ~90 chars)." },
+                        owner: { type: "string", description: "Who should own it, if stated." },
+                        due_hint: { type: "string", description: "Timing as said on the call." },
+                        priority: { type: "string", enum: ["low", "medium", "high"] },
+                      },
+                      required: ["title"],
+                      additionalProperties: false,
+                    },
+                  },
+                  suggested_projects: {
+                    type: "array",
+                    description: "New Studios (projects) worth spinning up because of this call — only when a distinct new body of work was discussed. Usually 0-2. Never suggest one for routine follow-ups.",
+                    items: {
+                      type: "object",
+                      properties: {
+                        name: { type: "string", description: "Short Studio name (max ~60 chars)." },
+                        description: { type: "string", description: "One-line description of the work." },
+                        suggested_members: {
+                          type: "array",
+                          description: "Names of people from the call who should be in it.",
+                          items: { type: "string" },
+                        },
+                      },
+                      required: ["name", "description"],
+                      additionalProperties: false,
+                    },
+                  },
                 },
                 required: ["transcript", "summary", "chapters", "action_items"],
                 additionalProperties: false,
@@ -239,9 +294,22 @@ serve(async (req) => {
         reason: string;
         confidence?: "high" | "medium" | "low";
       }>;
+      decisions?: string[];
+      next_steps?: Array<{
+        title: string;
+        owner?: string;
+        due_hint?: string;
+        priority?: "low" | "medium" | "high";
+      }>;
+      suggested_projects?: Array<{
+        name: string;
+        description: string;
+        suggested_members?: string[];
+      }>;
     };
 
-    // 4. Save transcript + summary + chapters + highlights + co-sign hints.
+    // 4. Save transcript + summary + chapters + highlights + co-sign hints
+    //    + Meeting Intelligence extras (decisions, next steps, new Studios).
     await admin
       .from("call_transcripts")
       .update({
@@ -251,6 +319,9 @@ serve(async (req) => {
         chapters: parsed.chapters ?? [],
         highlights: parsed.highlights ?? [],
         co_sign_suggestions: parsed.co_sign_suggestions ?? [],
+        decisions: parsed.decisions ?? [],
+        next_steps: parsed.next_steps ?? [],
+        suggested_projects: parsed.suggested_projects ?? [],
         status: "ready",
       })
       .eq("id", transcript_id);
@@ -269,6 +340,21 @@ serve(async (req) => {
       }));
       const { error: aiErr } = await admin.from("call_action_items").insert(rows);
       if (aiErr) console.warn("[transcribe-call] action items insert failed", aiErr);
+    }
+
+    // 5b. Suggested Studios become reviewable action items too, so the host
+    //     can spin one up from the recap with a single tap.
+    if (parsed.suggested_projects?.length) {
+      const studioRows = parsed.suggested_projects.slice(0, 3).map((p) => ({
+        transcript_id,
+        kind: "studio",
+        title: p.name.slice(0, 500),
+        detail: [p.description, p.suggested_members?.length ? `With: ${p.suggested_members.join(", ")}` : null]
+          .filter(Boolean)
+          .join("\n\n"),
+      }));
+      const { error: spErr } = await admin.from("call_action_items").insert(studioRows);
+      if (spErr) console.warn("[transcribe-call] studio suggestions insert failed", spErr);
     }
 
     // 6. Embed into Thrive Brain (best-effort) for retrieval by the Copilot.
