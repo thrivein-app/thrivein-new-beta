@@ -12,13 +12,13 @@
 import type { ReactNode } from "react";
 
 interface DeskShellProps {
-  /** <DeskSidebar> */
-  sidebar: ReactNode;
+  /** Optional legacy sidebar. The Desk now uses an overlay switcher instead. */
+  sidebar?: ReactNode;
   /** Everything to the right of the sidebar — normally <DeskWorkspace>. */
   children: ReactNode;
   /** Mobile drawer state, owned by the page. */
-  mobileSidebarOpen: boolean;
-  onCloseMobileSidebar: () => void;
+  mobileSidebarOpen?: boolean;
+  onCloseMobileSidebar?: () => void;
 }
 
 export function DeskShell({
@@ -29,7 +29,7 @@ export function DeskShell({
 }: DeskShellProps) {
   return (
     <div className="flex h-[calc(100dvh-4rem)] touch-pan-y flex-col overflow-hidden bg-background pb-[calc(6.5rem+env(safe-area-inset-bottom))] lg:h-[100dvh] lg:flex-row lg:pb-0">
-      {mobileSidebarOpen && (
+      {sidebar && mobileSidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/50 lg:hidden"
           onClick={onCloseMobileSidebar}
@@ -41,5 +41,6 @@ export function DeskShell({
     </div>
   );
 }
+
 
 export default DeskShell;
