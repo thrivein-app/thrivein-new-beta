@@ -49,10 +49,10 @@ import { Badge } from "@/components/ui/badge";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { VoiceFirstCreateModal } from "@/components/project/studio/VoiceFirstCreateModal";
-import { StudioCardsGrid } from "@/components/project/studio/StudioCardsGrid";
-import { StudioProjectsDashboard } from "@/components/project/studio/StudioProjectsDashboard";
+import { StudioLibrary } from "@/components/project/studio/StudioLibrary";
 import { StudioCreateHero } from "@/components/project/studio/StudioCreateHero";
-import { StudioFoldersBar, type StudioFolder } from "@/components/project/studio/StudioFoldersBar";
+import { type StudioFolder } from "@/components/project/studio/StudioFoldersBar";
+
 import { toast } from "sonner";
 import { TodayStrip } from "@/components/desk/TodayStrip";
 import { DeskCommandPalette } from "@/components/desk/DeskCommandPalette";
