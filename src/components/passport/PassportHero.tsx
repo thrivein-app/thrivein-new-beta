@@ -7,6 +7,8 @@ import {
   Camera, PencilLine, MapPin, ShieldCheck, Share2, QrCode, FileDown, ArrowRight, Star, Gauge, Fingerprint,
 } from "lucide-react";
 import { HoloCard } from "./HoloCard";
+import { CraftStamp } from "./CraftStamp";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AvailabilityIndicator } from "@/components/profile/AvailabilityIndicator";
 import { TrustSignals } from "@/components/profile/TrustSignals";
 import { SocialStatsInline } from "@/components/profile/SocialStatsInline";
@@ -172,17 +174,8 @@ export function PassportHero({
                 )}
               </Button>
             </div>
-            <Badge
-              variant="outline"
-              className={
-                isVerifiedPro
-                  ? "bg-[hsl(var(--signal-teal))]/15 text-[hsl(var(--signal-teal))] border-[hsl(var(--signal-teal))]/40 shrink-0"
-                  : "bg-muted text-muted-foreground border-border shrink-0"
-              }
-            >
-              <ShieldCheck className="h-3 w-3 mr-1" />
-              {isVerifiedPro ? `L${standing.level} ${standing.title}` : `L${standing.level}`}
-            </Badge>
+            {/* Craft stamp — replaces the old flat "L1" chip, same slot. */}
+            <CraftStamp profile={profile} caption={isVerifiedPro ? standing.title : undefined} />
           </div>
 
           {/* Name + roles + location */}
