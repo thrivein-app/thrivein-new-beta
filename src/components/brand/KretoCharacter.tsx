@@ -187,7 +187,7 @@ export const KretoCharacter = ({
           underneath so the figure sits in the scene instead of floating. */}
       <span
         aria-hidden
-        className="pointer-events-none absolute left-1/2 -translate-x-1/2 rounded-[50%] blur-md"
+        className="kreto-contact-shadow pointer-events-none absolute left-1/2 -translate-x-1/2 rounded-[50%] blur-md"
         style={{
           bottom: "1%",
           width: "56%",

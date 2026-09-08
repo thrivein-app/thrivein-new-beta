@@ -25,7 +25,7 @@ describe("KretoCharacter", () => {
 
   it("shows no status badge and no extra announcement when idle", () => {
     const { container } = render(<KretoCharacter state="idle" />);
-    expect(container.querySelector("[aria-hidden] > span:not(.sr-only)")).toBeNull();
+    expect(container.querySelector("[aria-hidden] > span:not(.sr-only):not(.kreto-contact-shadow)")).toBeNull();
     expect(container.querySelector(".sr-only")).toHaveTextContent("Kreto");
   });
 
