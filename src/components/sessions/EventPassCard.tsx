@@ -2,12 +2,9 @@ import { Button } from "@/components/ui/button";
 import { HoloCard } from "@/components/passport/HoloCard";
 import { BrandLogo } from "@/components/BrandLogo";
 import { KretopiaQRCode } from "@/components/brand/KretopiaQRCode";
-import { Loader2, Ticket, Check, Calendar, MapPin, CalendarPlus, Navigation } from "lucide-react";
+import { Ticket, Check, Calendar, MapPin, CalendarPlus, Navigation } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-
-const ENERGY = "#FF2DA1";
-const MIDNIGHT = "#0B0B10";
 
 interface EventPassCardProps {
   eventTitle: string;
@@ -48,22 +45,15 @@ export const EventPassCard = ({
     <HoloCard className={className}>
       <div className="relative overflow-hidden rounded-2xl border border-border bg-card">
         {/* Header — dark Kretopia plate, same signature as the landing hero / feature headers */}
-        <div className="relative overflow-hidden px-5 pt-5 pb-6 text-center" style={{ backgroundColor: "#05070D" }}>
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 ai-ambient-breathe"
-            style={{ background: `radial-gradient(70% 60% at 50% 0%, ${ENERGY}26, transparent 65%)` }}
-          />
+        <div className="relative overflow-hidden bg-background px-5 pb-6 pt-5 text-center">
+          <div aria-hidden className="passport-qr-header-glow pointer-events-none absolute inset-0 ai-ambient-breathe" />
           <div className="relative flex flex-col items-center">
             <BrandLogo size="sm" lockup />
-            <div
-              className="mt-4 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em]"
-              style={{ color: ENERGY, backgroundColor: `${ENERGY}1A`, border: `1px solid ${ENERGY}40` }}
-            >
+            <div className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-[hsl(var(--energy)/0.25)] bg-[hsl(var(--energy)/0.1)] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[hsl(var(--energy))]">
               <Ticket className="h-3 w-3" /> Your pass
             </div>
-            <h2 className="text-xl font-bold mt-2 leading-tight text-white">{eventTitle}</h2>
-            {guestName && <p className="text-sm text-white/60 mt-0.5">{guestName}</p>}
+            <h2 className="mt-2 text-xl font-bold leading-tight text-foreground">{eventTitle}</h2>
+            {guestName && <p className="mt-0.5 text-sm text-muted-foreground">{guestName}</p>}
           </div>
         </div>
 
@@ -76,28 +66,21 @@ export const EventPassCard = ({
 
         {/* QR — the priority element on the card, framed with the same ambient-glow + scan-line signature used across Kretopia's AI-powered surfaces */}
         <div className="relative px-5 pt-5 pb-2">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -inset-x-2 top-2 h-64 rounded-[32px] blur-2xl opacity-70 ai-ambient-breathe"
-            style={{ background: `radial-gradient(60% 100% at 50% 30%, ${ENERGY}22, transparent 70%)` }}
-          />
+          <div aria-hidden className="passport-qr-glow pointer-events-none absolute -inset-x-2 top-2 h-64 rounded-[32px] blur-2xl opacity-70 ai-ambient-breathe" />
           <div aria-hidden className="pointer-events-none absolute inset-x-8 top-3 h-px overflow-hidden rounded-full">
-            <div
-              className="ai-scan-line h-full w-1/3"
-              style={{ background: `linear-gradient(90deg, transparent, ${ENERGY}, transparent)` }}
-            />
+            <div className="holo-card-scan h-full w-1/3" />
           </div>
 
           <div className="relative flex flex-col items-center">
             {loading ? (
-              <div className="h-[240px] w-[240px] flex items-center justify-center">
-                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              <div className="flex h-[264px] w-[264px] items-center justify-center rounded-2xl border border-border bg-muted/40">
+                <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-[hsl(var(--energy))] shadow-[0_0_16px_hsl(var(--energy)/0.65)]" aria-label="Loading pass" />
               </div>
             ) : token ? (
               <>
                 <KretopiaQRCode value={token} ariaLabel={`Entry QR code for ${eventTitle}`} />
                 {checkedIn ? (
-                  <div className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-green-600">
+                  <div className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-success">
                     <Check className="h-4 w-4" /> You're checked in
                   </div>
                 ) : (
