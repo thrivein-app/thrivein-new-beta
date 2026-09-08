@@ -1,9 +1,5 @@
-import coverPhoto from "@/assets/scout/cover-photo.jpg";
-import coverFilm from "@/assets/scout/cover-film.jpg";
-import coverMusic from "@/assets/scout/cover-music.jpg";
-import coverDesign from "@/assets/scout/cover-design.jpg";
-import coverWriting from "@/assets/scout/cover-writing.jpg";
-import coverGeneric from "@/assets/scout/cover-generic.jpg";
+import kretoCoverAsset from "@/assets/kreto-cover.jpg.asset.json";
+const kretoCover = kretoCoverAsset.url;
 
 export type StudioTypeId = "photo" | "video" | "music" | "design" | "brand" | "writing" | "event" | "project";
 
@@ -14,14 +10,14 @@ export interface StudioType {
 }
 
 const TYPES: Record<StudioTypeId, StudioType> = {
-  photo: { id: "photo", label: "Photo", cover: coverPhoto },
-  video: { id: "video", label: "Video", cover: coverFilm },
-  music: { id: "music", label: "Music", cover: coverMusic },
-  design: { id: "design", label: "Design", cover: coverDesign },
-  brand: { id: "brand", label: "Brand", cover: coverDesign },
-  writing: { id: "writing", label: "Writing", cover: coverWriting },
-  event: { id: "event", label: "Event", cover: coverGeneric },
-  project: { id: "project", label: "Project", cover: coverGeneric },
+  photo: { id: "photo", label: "Photo", cover: kretoCover },
+  video: { id: "video", label: "Video", cover: kretoCover },
+  music: { id: "music", label: "Music", cover: kretoCover },
+  design: { id: "design", label: "Design", cover: kretoCover },
+  brand: { id: "brand", label: "Brand", cover: kretoCover },
+  writing: { id: "writing", label: "Writing", cover: kretoCover },
+  event: { id: "event", label: "Event", cover: kretoCover },
+  project: { id: "project", label: "Project", cover: kretoCover },
 };
 
 /** workspace_type values used across the Studio slices. */

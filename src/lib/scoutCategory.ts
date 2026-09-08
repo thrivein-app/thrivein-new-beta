@@ -1,12 +1,8 @@
+import kretoCoverAsset from "@/assets/kreto-cover.jpg.asset.json";
+const kretoCover = kretoCoverAsset.url;
 // Infers a discipline for a scouted gig from its free text, so every card can
 // show a meaningful HD cover + a human "what kind of work is this" subtitle
 // even when the source page gave us no image at all.
-import coverMusic from "@/assets/scout/cover-music.jpg";
-import coverFilm from "@/assets/scout/cover-film.jpg";
-import coverDesign from "@/assets/scout/cover-design.jpg";
-import coverPhoto from "@/assets/scout/cover-photo.jpg";
-import coverWriting from "@/assets/scout/cover-writing.jpg";
-import coverGeneric from "@/assets/scout/cover-generic.jpg";
 
 export type ScoutCategoryId =
   | "music"
@@ -25,12 +21,12 @@ export interface ScoutCategory {
 }
 
 const CATEGORIES: Record<ScoutCategoryId, ScoutCategory> = {
-  music: { id: "music", label: "Music & audio", cover: coverMusic },
-  film: { id: "film", label: "Video & film", cover: coverFilm },
-  design: { id: "design", label: "Design & brand", cover: coverDesign },
-  photo: { id: "photo", label: "Photography", cover: coverPhoto },
-  writing: { id: "writing", label: "Writing & content", cover: coverWriting },
-  creative: { id: "creative", label: "Creative work", cover: coverGeneric },
+  music: { id: "music", label: "Music & audio", cover: kretoCover },
+  film: { id: "film", label: "Video & film", cover: kretoCover },
+  design: { id: "design", label: "Design & brand", cover: kretoCover },
+  photo: { id: "photo", label: "Photography", cover: kretoCover },
+  writing: { id: "writing", label: "Writing & content", cover: kretoCover },
+  creative: { id: "creative", label: "Creative work", cover: kretoCover },
 };
 
 const MATCHERS: Array<[ScoutCategoryId, RegExp]> = [
