@@ -93,6 +93,22 @@ serve(async (req) => {
         .single();
       pushedToId = row?.id ?? null;
       pushedToKind = "project_notes";
+    } else if (item.kind === "studio") {
+      // Spin up a new Studio (project) from a suggestion Kreto made on a call.
+      const { data: row, error: projErr } = await admin
+        .from("projects")
+        .insert({
+          title: item.title.slice(0, 120),
+          description: item.detail ?? null,
+          created_by: userId,
+          workspace_type: "general",
+          status: "active",
+        })
+        .select("id")
+        .single();
+      if (projErr) throw new Error(projErr.message);
+      pushedToId = row?.id ?? null;
+      pushedToKind = "projects";
     } else if (item.kind === "credit") {
       // Best-effort: leave credit creation to the user via the credits flow.
       pushedToKind = "manual_credit";

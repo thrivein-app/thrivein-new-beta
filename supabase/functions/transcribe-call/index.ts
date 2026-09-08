@@ -45,6 +45,23 @@ serve(async (req) => {
     if (!DAILY_API_KEY) throw new Error("DAILY_API_KEY missing");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY missing");
 
+    // Consent gate — the host can switch Kreto off for a call. When off we
+    // never download the recording, never transcribe, and store nothing.
+    const { data: consentRow } = await admin
+      .from("call_transcripts")
+      .select("kreto_enabled")
+      .eq("id", transcript_id)
+      .maybeSingle();
+    if (consentRow && consentRow.kreto_enabled === false) {
+      await admin
+        .from("call_transcripts")
+        .update({ status: "ready", summary: null, transcript: null })
+        .eq("id", transcript_id);
+      return new Response(JSON.stringify({ ok: true, skipped: "kreto_disabled" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     await admin.from("call_transcripts").update({ status: "transcribing" }).eq("id", transcript_id);
 
     // 1. Get a fresh download link (Daily access links expire ~120s).
