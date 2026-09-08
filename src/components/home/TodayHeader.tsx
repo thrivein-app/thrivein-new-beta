@@ -23,7 +23,7 @@ export function TodayHeader({ firstName, subtitle, className }: TodayHeaderProps
 
   const line =
     subtitle ??
-    "Your Creative Passport is doing the work — want me to draft an outreach DM?";
+    `Your Creative Passport is doing the work, ${firstName} — want me to draft an outreach DM?`;
 
   return (
     <motion.section
