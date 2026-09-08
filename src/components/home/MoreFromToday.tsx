@@ -153,7 +153,7 @@ export function MoreFromToday({ peopleForYou, profile, profileFull, myCredits = 
   const show = (bucket: Filter) => filter === "all" || filter === bucket;
 
   return (
-    <TodaySectionShell icon={<LayoutGrid className="h-4 w-4" />} eyebrow="Your dashboard" title="More from Today">
+    <TodaySectionShell icon={<LayoutGrid className="h-4 w-4" />} eyebrow="Also today" title="More from Today">
       {/* Filter chips — real, stateful, not decorative */}
       <div role="tablist" aria-label="Filter today's content" className="flex flex-wrap gap-1.5 mb-4">
         {filters.map((f) => (
