@@ -220,8 +220,9 @@ export function ScoutedGigsSection({ limit }: ScoutedGigsSectionProps = {}) {
   const openDetail = async (gig: ScoutedGig) => {
     if (!user) return;
     setOpenGig(gig);
-    setCoverLetter("");
-    setSubject("");
+    const cached = draftCache.current[gig.id];
+    setCoverLetter(cached?.body || "");
+    setSubject(cached?.subject || "");
     await supabase.from("scouted_gig_actions").upsert({
       user_id: user.id, scouted_gig_id: gig.id, action: "opened",
     }).then(() => {}, () => {});
@@ -240,23 +241,50 @@ export function ScoutedGigsSection({ limit }: ScoutedGigsSectionProps = {}) {
         );
       }
     }
+
+    // The email should already be written by the time they reach the buttons,
+    // personalised to their Passport and to this exact gig.
+    if (!cached) draftLetter(gig.id);
   };
 
-  const draftLetter = async () => {
-    if (!openGig || !user) return;
+  const draftLetter = async (gigId?: string) => {
+    const id = gigId || openGig?.id;
+    if (!id || !user) return null;
     setDrafting(true);
     const { data, error } = await supabase.functions.invoke("draft-gig-application", {
-      body: { scouted_gig_id: openGig.id },
+      body: { scouted_gig_id: id },
     });
     setDrafting(false);
-    if (error || !data?.cover_letter) {
-      toast({ title: "Couldn't draft letter", variant: "destructive" });
-      return;
+    const body = data?.body || data?.cover_letter;
+    if (error || !body) {
+      toast({ title: "Couldn't draft the email", variant: "destructive" });
+      return null;
     }
-    setCoverLetter(data.cover_letter);
+    const draft = { subject: data?.subject || "", body: body as string };
+    draftCache.current[id] = draft;
+    setCoverLetter(draft.body);
+    setSubject(draft.subject);
     supabase.from("scouted_gig_actions").upsert({
-      user_id: user.id, scouted_gig_id: openGig.id, action: "drafted",
+      user_id: user.id, scouted_gig_id: id, action: "drafted",
     }).then(() => {}, () => {});
+    return draft;
+  };
+
+  // Opens the mail client with the personalised email already filled in,
+  // drafting first if the background draft hasn't landed yet.
+  const emailApply = async () => {
+    if (!openGig?.contact_email) return;
+    trackApplyClick();
+    let body = coverLetter;
+    let subj = subject;
+    if (!body) {
+      const draft = await draftLetter(openGig.id);
+      body = draft?.body || "";
+      subj = draft?.subject || "";
+    }
+    const finalSubject = subj || `Application — ${openGig.title}${openGig.company ? ` @ ${openGig.company}` : ""}`;
+    window.location.href =
+      `mailto:${openGig.contact_email}?subject=${encodeURIComponent(finalSubject)}&body=${encodeURIComponent(body)}`;
   };
 
   const trackApplyClick = () => {
