@@ -8,13 +8,8 @@ interface HoloCardProps {
   maxTilt?: number;
 }
 
-/**
- * HoloCard — premium collectible-card shell (Pokémon TCG feel).
- * Pointer-tracked 3D tilt, holographic sheen, layered depth and edge highlight.
- * Pure CSS/transform: no dependencies, GPU-composited, disabled for touch
- * devices and for users who prefer reduced motion.
- */
-export function HoloCard({ children, className, maxTilt = 8 }: HoloCardProps) {
+/** Kretopia's premium credential shell: dimensional, refractive and restrained. */
+export function HoloCard({ children, className, maxTilt = 6 }: HoloCardProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [glare, setGlare] = useState({ x: 50, y: 50, on: false });
@@ -57,65 +52,45 @@ export function HoloCard({ children, className, maxTilt = 8 }: HoloCardProps) {
   }, []);
 
   return (
-    <div className={cn("[perspective:1200px]", className)}>
+    <div className={cn("[perspective:1600px]", className)}>
       <div
         ref={ref}
         onPointerMove={onMove}
         onPointerLeave={onLeave}
-        className="relative h-full rounded-2xl transition-transform duration-300 ease-out will-change-transform [transform-style:preserve-3d]"
+        className="group/holo relative isolate h-full rounded-2xl transition-transform duration-500 ease-out will-change-transform [transform-style:preserve-3d] motion-reduce:transform-none"
         style={{
           transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateZ(0)`,
         }}
       >
-        {/* Depth glow behind the card — slow ambient breathe reads as "AI-aware" presence */}
+        {/* A quiet energy field separates the credential from the page. */}
         <div
           aria-hidden
-          className="ai-ambient-breathe pointer-events-none absolute -inset-2 rounded-[26px] blur-2xl"
+          className="holo-card-aura pointer-events-none absolute -inset-3 rounded-[24px] blur-2xl"
           style={{
-            background:
-              "linear-gradient(135deg, hsl(var(--signal-teal)/0.35), transparent 45%, hsl(var(--signal-pink,320 100% 60%)/0.28))",
             transform: "translateZ(-40px)",
             animationPlayState: inView ? "running" : "paused",
           }}
         />
 
-        {/* Card body */}
-        <div className="relative h-full overflow-hidden rounded-2xl shadow-[0_20px_50px_-20px_rgba(0,0,0,0.75),0_2px_0_0_rgba(255,255,255,0.06)_inset]">
-          {/* Scan-line sweep along the top edge — same "actively scanning" motion as the AI tutorial surfaces */}
-          <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px overflow-hidden z-10">
-            <div
-              className="ai-scan-line h-full w-1/3"
-              style={{
-                background: "linear-gradient(90deg, transparent, hsl(var(--signal-teal)/0.9), transparent)",
-                animationPlayState: inView ? "running" : "paused",
-              }}
-            />
+        <div className="holo-card-frame relative h-full overflow-hidden rounded-2xl">
+          <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-30 h-px overflow-hidden">
+            <div className="holo-card-scan h-full w-2/5" style={{ animationPlayState: inView ? "running" : "paused" }} />
           </div>
-          {children}
 
-          {/* Foil sheen */}
+          <div className="relative z-10 h-full [transform:translateZ(1px)]">{children}</div>
+
+          {/* Pointer-following optical foil, strongest only while engaged. */}
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 mix-blend-soft-light transition-opacity duration-300"
+            className="pointer-events-none absolute inset-0 z-20 mix-blend-soft-light transition-opacity duration-500"
             style={{
-              opacity: glare.on ? 0.85 : 0.28,
-              background: `radial-gradient(120% 90% at ${glare.x}% ${glare.y}%, rgba(255,255,255,0.55), rgba(255,255,255,0.08) 35%, transparent 65%)`,
+              opacity: glare.on ? 0.78 : 0.18,
+              background: `radial-gradient(110% 80% at ${glare.x}% ${glare.y}%, hsl(var(--foreground) / 0.46), hsl(var(--energy) / 0.12) 30%, transparent 66%)`,
             }}
           />
-          {/* Prismatic edge */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 rounded-2xl"
-            style={{
-              padding: 1,
-              background:
-                "linear-gradient(135deg, rgba(255,255,255,0.35), rgba(255,255,255,0.02) 30%, rgba(255,255,255,0.02) 70%, rgba(255,255,255,0.28))",
-              WebkitMask:
-                "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
-              WebkitMaskComposite: "xor",
-              maskComposite: "exclude",
-            }}
-          />
+          <div aria-hidden className="holo-card-grid pointer-events-none absolute inset-0 z-20 opacity-40" />
+          <div aria-hidden className="holo-card-edge pointer-events-none absolute inset-0 z-30 rounded-2xl" />
+          <span aria-hidden className="absolute bottom-3 right-3 z-30 h-1.5 w-1.5 rounded-full bg-[hsl(var(--energy))] shadow-[0_0_12px_hsl(var(--energy)/0.8)]" />
         </div>
       </div>
     </div>
