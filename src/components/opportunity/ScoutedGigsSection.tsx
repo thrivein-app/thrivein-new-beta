@@ -407,74 +407,16 @@ export function ScoutedGigsSection({ limit }: ScoutedGigsSectionProps = {}) {
         <>
         {/* One strongest opportunity first — gigs are already ordered by fit_score desc. */}
         {gigs[0] && (
-          <div
-            onClick={() => openDetail(gigs[0])}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openDetail(gigs[0]); } }}
-            aria-label={`View brief for ${gigs[0].title}, your strongest match`}
-            className="group relative rounded-2xl overflow-hidden border border-energy/30 bg-card cursor-pointer transition-all hover:border-energy/50 hover:shadow-2xl hover:shadow-energy/10 sm:flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-energy"
-          >
-            <div className="relative aspect-[16/9] sm:aspect-auto sm:w-64 shrink-0 overflow-hidden">
-              {gigs[0].image_url ? (
-                <img
-                  src={gigs[0].image_url}
-                  alt={gigs[0].title}
-                  loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-energy/30 via-primary/10 to-background flex items-center justify-center">
-                  {(() => { const Icon = SOURCE_ICON[gigs[0].source] || Globe; return <Icon className="h-14 w-14 text-foreground/15" strokeWidth={1.5} />; })()}
-                </div>
-              )}
-              <div className="absolute top-2.5 left-2.5">
-                <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-background/80 backdrop-blur-sm border-border">
-                  Strongest match
-                </Badge>
-              </div>
-            </div>
-            <div className="p-4 flex flex-col gap-2.5 flex-1 min-w-0">
-              <div className="flex items-start justify-between gap-2">
-                <h3 className="font-bold text-lg leading-tight text-foreground">{gigs[0].title}</h3>
-                <Badge className="h-5 text-[10px] bg-energy/15 text-energy border-energy/30 shrink-0">
-                  {gigs[0].fit_score}% fit
-                </Badge>
-              </div>
-              {(gigs[0].company || gigs[0].location || hasRealCompensation(gigs[0].compensation)) && (
-                <div className="text-xs text-muted-foreground flex items-center gap-1.5 flex-wrap">
-                  {gigs[0].company && <span className="font-medium text-foreground/90">{gigs[0].company}</span>}
-                  {gigs[0].location && <><span>·</span><MapPin className="h-3 w-3" />{gigs[0].location}</>}
-                  {gigs[0].remote && <Badge variant="outline" className="h-4 text-[9px] px-1">Remote</Badge>}
-                  {hasRealCompensation(gigs[0].compensation) && <><span>·</span><span className="font-medium text-foreground/90">{gigs[0].compensation}</span></>}
-                </div>
-              )}
-              {gigs[0].fit_reason && (
-                <div className="rounded-lg bg-energy/[0.06] border border-energy/20 px-3 py-2">
-                  <div className="text-[9px] uppercase tracking-wider font-bold text-energy mb-0.5 flex items-center gap-1">
-                    <Sparkles className="h-2.5 w-2.5" />
-                    Why this fits you
-                  </div>
-                  <p className="text-xs leading-relaxed text-foreground/80">{gigs[0].fit_reason}</p>
-                </div>
-              )}
-              <div className="mt-auto flex items-center gap-2 pt-1" onClick={(e) => e.stopPropagation()}>
-                <Button size="sm" onClick={() => openDetail(gigs[0])} className="gap-1.5">
-                  View full brief
-                </Button>
-                <Button size="sm" variant="outline" onClick={(e) => save(gigs[0].id, e)} className="gap-1.5">
-                  <Bookmark className="h-3.5 w-3.5" />
-                  Save
-                </Button>
-                <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); dismiss(gigs[0].id); }} className="gap-1.5 text-muted-foreground">
-                  <X className="h-3.5 w-3.5" />
-                  Dismiss
-                </Button>
-              </div>
-            </div>
-          </div>
+          <ScoutedCard
+            {...cardProps(gigs[0])}
+            variant="feature"
+            priorityImage
+            ribbon="Strongest match"
+            ctaLabel="View full brief"
+            className="border-energy/30"
+          />
         )}
+
 
         {/* Everything else — carousel, not a card wall. */}
         {gigs.length > 1 && (
