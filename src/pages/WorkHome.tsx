@@ -579,86 +579,31 @@ const CreatorWorkHome = () => {
             fetchProjects();
           };
 
-          const hasFolders = folders.length > 0;
-          const atRoot = folderFilter === "all";
-          const currentFolder = folders.find((f) => f.id === folderFilter);
-          const unfiledProjects = projects.filter((p) => !(p as any).studio_folder_id);
+          if (!user) return null;
 
-          // ── INSIDE A FOLDER (Drive-style detail view) ──
-          if (!atRoot && projects.length > 0) {
-            const folderName =
-              folderFilter === "unfiled" ? "Unfiled" : currentFolder?.name ?? "Folder";
-            const FolderIcon = folderFilter === "unfiled" ? Inbox : Folder;
-            return (
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setFolderFilter("all")}
-                    className="h-9 -ml-2 gap-1 rounded-full text-muted-foreground hover:text-foreground"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                    Folders
-                  </Button>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="h-11 w-11 rounded-2xl bg-muted grid place-items-center">
-                    <FolderIcon className="h-5 w-5 text-foreground/80" />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <h2 className="text-xl font-black tracking-[-0.02em] truncate">
-                      {folderName}
-                    </h2>
-                    <p className="text-xs text-muted-foreground">
-                      {visibleProjects.length}{" "}
-                      {visibleProjects.length === 1 ? "project" : "projects"}
-                    </p>
-                  </div>
-                </div>
-                <StudioCardsGrid
-                  projects={visibleProjects as any}
-                  invoicesByProject={invoicesByProject}
-                  moneyVisibleByProject={moneyVisibleByProject}
-                  onNewProject={() => setShowCreateProject(true)}
-                  folders={folders}
-                  onMoveToFolder={moveProject}
-                  hideHero
-                />
-              </div>
-            );
-          }
-
-          // ── ROOT — folders grid + Projects dashboard below ──
+          // Folders + Projects are one surface now — StudioLibrary owns
+          // the folder shelf, the scoping (root shows unfiled work when
+          // folders exist) and the illustrated Project wall.
           return (
-            <>
-              {user && (projects.length > 0 || hasFolders) && (
-                <StudioFoldersBar
-                  userId={user.id}
-                  folders={folders}
-                  counts={folderCounts}
-                  selected={folderFilter}
-                  onSelect={setFolderFilter}
-                  onChanged={() => { fetchFolders(); fetchProjects(); }}
-                  onDropProject={moveProject}
-                />
-              )}
-
-              {/* One Projects dashboard for every root view. When folders
-                  exist we scope it to the unfiled Projects (previously
-                  labeled "Loose projects" — copy only, no data change). */}
-              <StudioProjectsDashboard
-                projects={(hasFolders ? unfiledProjects : projects) as any}
-                invoicesByProject={invoicesByProject}
-                moneyVisibleByProject={moneyVisibleByProject}
-                onCreate={() => setShowCreateProject(true)}
-                folders={folders}
-                onMoveToFolder={moveProject}
-              />
-
-            </>
+            <StudioLibrary
+              userId={user.id}
+              projects={projects as any}
+              invoicesByProject={invoicesByProject}
+              moneyVisibleByProject={moneyVisibleByProject}
+              onCreate={() => setShowCreateProject(true)}
+              folders={folders}
+              folderCounts={folderCounts}
+              folderFilter={folderFilter}
+              onSelectFolder={setFolderFilter}
+              onFoldersChanged={() => { fetchFolders(); fetchProjects(); }}
+              onMoveToFolder={moveProject}
+            />
           );
         })()}
+
+        {/* Casting & Collaborators — prioritized above Session & Activity:
+            people are the thing a creator acts on first. */}
+        <CastingCollaboratorsSection collaborators={recentCollaborators} />
 
         {/* Session & Activity — control-room block. Live Sound Stages,
             tonight's speed session, today's plan, and pending invites used
@@ -684,58 +629,6 @@ const CreatorWorkHome = () => {
           <MyPendingInvitations />
         </SectionCard>
 
-        {/* Casting & Collaborators — control-room block. Open casting
-            calls, recent recordings, and the people you've worked with
-            most recently used to be three independent stacked sections. */}
-        <SectionCard title="Casting & Collaborators">
-          <div>
-            <h3 className="text-sm font-semibold mb-2">Casting calls</h3>
-            {/* Real open opportunities of type "casting". Reuses
-                GigRailCard as-is (same card used in OpportunitiesFeed's
-                grid) rather than a new card design. */}
-            <CastingCallsRail />
-          </div>
-          <RecentRecordingsRail />
-          {/* Recent collaborators — real people from the user's most
-              recently active projects, via the same get_project_people RPC
-              useProjectData already calls per-project; just run over a few
-              projects and deduped here. Self-hides when there's nobody yet. */}
-          {recentCollaborators.length > 0 && (
-            <div>
-              <h3 className="text-sm font-semibold mb-2">Recent collaborators</h3>
-              <div className="relative">
-              <Carousel setApi={setCollabApi} opts={{ align: "start", dragFree: true, duration: reducedMotion ? 0 : 20 }} className="w-full" aria-label="Recent collaborators">
-                <CarouselContent className="-ml-3">
-                  {recentCollaborators.map((c) => (
-                    <CarouselItem key={c.id} className="pl-3 basis-auto">
-                      <button
-                        type="button"
-                        onClick={() => navigate(`/profile/${c.id}`)}
-                        className="w-28 rounded-2xl border border-border bg-card p-3 text-center transition-all hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                      >
-                        <div className="h-14 w-14 mx-auto rounded-full overflow-hidden bg-muted mb-2">
-                          {c.avatar_url ? (
-                            <img src={c.avatar_url} alt={c.full_name} className="h-full w-full object-cover" />
-                          ) : (
-                            <div className="h-full w-full flex items-center justify-center text-sm font-bold text-muted-foreground">
-                              {c.full_name[0]}
-                            </div>
-                          )}
-                        </div>
-                        <p className="text-xs font-semibold truncate">{c.full_name}</p>
-                        {c.role && <p className="text-[10px] text-muted-foreground truncate">{c.role}</p>}
-                      </button>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious variant="glass" className="hidden sm:flex -left-3" aria-label="Previous — recent collaborators" />
-                <CarouselNext variant="glass" className="hidden sm:flex -right-3" aria-label="Next — recent collaborators" />
-              </Carousel>
-              <CarouselPositionDots api={collabApi} label="Recent collaborators" className="mt-2" />
-              </div>
-            </div>
-          )}
-        </SectionCard>
       </div>
 
 
