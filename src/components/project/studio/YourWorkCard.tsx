@@ -109,7 +109,7 @@ export const YourWorkCard = ({
 
         {/* Quick actions — visible on hover and whenever focused */}
         {(onShare || onMove) && (
-          <div className="absolute bottom-3 right-3 flex gap-1.5 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+          <div className="absolute bottom-3 right-3 z-[2] flex gap-1.5 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
             {onShare && (
               <button
                 type="button"
@@ -166,8 +166,6 @@ export const YourWorkCard = ({
       >
         <span className="sr-only">Open {p.title}</span>
       </button>
-      {/* Quick actions sit above the hit target */}
-      <style>{""}</style>
     </article>
   );
 };
