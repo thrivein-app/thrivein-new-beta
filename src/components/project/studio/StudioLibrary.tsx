@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CtaButton } from "@/components/ui/cta-button";
-import { moodGradient, moodLabel } from "./moodGradient";
+import { moodGradient } from "./moodGradient";
 import { STATUS_PILL, PAY_DOT, PAY_LABEL, type StudioProject } from "./studioCardHelpers";
 import { MoveToFolderSheet } from "./MoveToFolderSheet";
 import { StudioFoldersBar, type StudioFolder } from "./StudioFoldersBar";
