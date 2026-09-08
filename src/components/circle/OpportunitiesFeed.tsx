@@ -112,7 +112,9 @@ export const OpportunitiesFeed = () => {
         .select(OPPORTUNITY_PUBLIC_COLUMNS)
         .in("status", ["active", "open"])
         .order("created_at", { ascending: false })
-        .limit(30);
+        // Every open gig, not a first page — the marketplace is the whole
+        // point of this feed and filters narrow it client-side anyway.
+        .limit(200);
 
       if (activeFilter !== "all") {
         if (activeFilter === "collab") {

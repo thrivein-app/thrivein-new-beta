@@ -21,6 +21,7 @@ import { CarouselPositionDots } from "@/components/ui/glass/CarouselPositionDots
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { KretoMark } from "@/components/brand/KretoMark";
 import { SmartWidget } from "@/components/ui/smart-widget";
+import { OpportunitiesFeed } from "@/components/circle/OpportunitiesFeed";
 
 interface ScoutedGig {
   id: string;
@@ -119,7 +120,10 @@ export function ScoutedGigsSection({ limit }: ScoutedGigsSectionProps = {}) {
         .gt("expires_at", new Date().toISOString())
         .order("fit_score", { ascending: false })
         .order("scouted_at", { ascending: false })
-        .limit(20);
+        // No artificial cap on a user's own scouted feed — the compact
+        // embed slices client-side via `limit`, the full Scout page shows
+        // everything that was actually found for them.
+        .limit(200);
 
       const { data: actions } = await supabase
         .from("scouted_gig_actions")
@@ -412,9 +416,18 @@ export function ScoutedGigsSection({ limit }: ScoutedGigsSectionProps = {}) {
       )}
 
       {gigs.length === 0 && !scanning ? (
-        <Card className="p-6 text-center text-sm text-muted-foreground border-dashed">
-          No scouted gigs yet. Tap <span className="font-semibold text-foreground">Scan now</span> to find real jobs across the web matched to your skills.
-        </Card>
+        // A brand-new user has nothing scouted *yet* — that is a timing
+        // artefact, not an empty product. Rather than a dead-end card, show
+        // every open gig on Kretopia straight away while the first scan
+        // runs, so Scout is never empty on first arrival.
+        <div className="space-y-4">
+          <Card className="p-4 text-sm text-muted-foreground border-dashed">
+            Kreto is still learning what fits you. In the meantime, here is{" "}
+            <span className="font-semibold text-foreground">every open gig on Kretopia</span> —
+            tap <span className="font-semibold text-foreground">Scan now</span> to add matches from across the web.
+          </Card>
+          {!limit && <OpportunitiesFeed />}
+        </div>
       ) : limit ? (
         <>
         {/* Compact embed (e.g. Today's "More from today") — carousel only, no hero. */}
