@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useProjectTimer, formatHMS } from "@/hooks/useProjectTimer";
 import { format } from "date-fns";
+import { StudioLoadingState } from "./primitives";
 
 interface StudioTimerProps {
   projectId: string;
@@ -194,9 +195,7 @@ export const StudioTimer = ({
           </SheetHeader>
 
           {loadingTotals ? (
-            <div className="py-10 flex items-center justify-center">
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-            </div>
+            <div className="py-6"><StudioLoadingState rows={2} /></div>
           ) : !totals || totals.count === 0 ? (
             <div className="py-8 text-center text-sm text-muted-foreground">
               No unbilled hours on this project yet. Hit{" "}

@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Award } from "lucide-react";
+import { StudioEmptyState } from "./primitives";
 
 interface AddCreditSectionProps {
   project: {
@@ -21,14 +22,12 @@ export const AddCreditSection = ({ project, collaborators }: AddCreditSectionPro
   if (project.status !== "completed") {
     return (
       <section className="px-4 py-5">
-        <div className="rounded-2xl border border-dashed border-border/60 p-4 text-center space-y-1.5">
-          <Award className="h-5 w-5 mx-auto text-muted-foreground" aria-hidden />
-          <p className="text-sm font-semibold">No credit yet</p>
-          <p className="text-xs text-muted-foreground leading-snug">
-            Credits unlock once "{project.title}" is wrapped — collaborators get tagged
-            automatically when you add it.
-          </p>
-        </div>
+        <StudioEmptyState
+          compact
+          icon={<Award className="h-5 w-5" aria-hidden />}
+          title="No credit yet"
+          description={`Credits unlock once "${project.title}" is wrapped — collaborators get tagged automatically when you add it.`}
+        />
       </section>
     );
   }

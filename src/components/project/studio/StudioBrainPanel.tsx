@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { StudioLoadingState } from "./primitives";
 
 interface Fact {
   id: string;
@@ -151,7 +152,7 @@ export function StudioBrainPanel({ projectId, isOwner }: Props) {
         </SheetHeader>
 
         {loading ? (
-          <div className="py-12 text-center"><Loader2 className="h-5 w-5 animate-spin mx-auto text-muted-foreground" /></div>
+          <div className="py-6"><StudioLoadingState rows={4} /></div>
         ) : (
           <div className="mt-4 space-y-6">
             <section>
