@@ -148,7 +148,36 @@
           localStorage.setItem("ui_vibe", "midnight");
         } catch (_) {}
       })();
+      // Browser tabs (not the installed app) must never be served a stale
+      // precached build. Unregister any leftover service worker + caches, and
+      // reload once if one was still controlling this page.
+      (function () {
+        try {
+          var standalone =
+            window.matchMedia("(display-mode: standalone)").matches ||
+            window.navigator.standalone === true;
+          if (standalone || !("serviceWorker" in navigator)) return;
+          var wasControlled = !!navigator.serviceWorker.controller;
+          navigator.serviceWorker.getRegistrations().then(function (regs) {
+            var jobs = regs.map(function (r) { return r.unregister(); });
+            if (window.caches) {
+              jobs.push(
+                caches.keys().then(function (keys) {
+                  return Promise.all(keys.map(function (k) { return caches.delete(k); }));
+                })
+              );
+            }
+            return Promise.all(jobs).then(function () {
+              if (wasControlled && !sessionStorage.getItem("sw_purge_reload")) {
+                sessionStorage.setItem("sw_purge_reload", "1");
+                window.location.reload();
+              }
+            });
+          }).catch(function () {});
+        } catch (_) {}
+      })();
     </script>
+
   </head>
 
   <body class="bg-background text-foreground">
