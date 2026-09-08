@@ -5,6 +5,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, ShieldCheck, Handshake, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import posterConnected from "@/assets/kretopia-poster-connected.jpg.asset.json";
+import posterFaster from "@/assets/kretopia-poster-faster.jpg.asset.json";
+
+const POSTER_FALLBACKS = [posterConnected.url, posterFaster.url];
+
 
 interface TrendingCreator {
   user_id: string;
@@ -153,22 +158,24 @@ export const TrendingLane = () => {
           </Card>
         ) : (
           <div className="grid grid-cols-2 gap-3">
-            {newCredits.map((cr) => (
+            {newCredits.map((cr, i) => (
               <Link
                 key={cr.id}
                 to={`/credit/${cr.id}`}
                 className="rounded-xl border border-border bg-card overflow-hidden hover:border-[hsl(var(--signal-teal))]/40 transition-colors"
               >
                 <div className="aspect-video bg-muted">
-                  {cr.thumbnail_url && !failedThumbs.has(cr.id) && (
-                    <img
-                      src={cr.thumbnail_url}
-                      alt={cr.project_name ?? ""}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                      onError={() => setFailedThumbs((prev) => new Set(prev).add(cr.id))}
-                    />
-                  )}
+                  <img
+                    src={
+                      cr.thumbnail_url && !failedThumbs.has(cr.id)
+                        ? cr.thumbnail_url
+                        : POSTER_FALLBACKS[i % POSTER_FALLBACKS.length]
+                    }
+                    alt={cr.project_name ?? "Kretopia"}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    onError={() => setFailedThumbs((prev) => new Set(prev).add(cr.id))}
+                  />
                 </div>
                 <div className="p-2.5">
                   <p className="text-xs font-semibold truncate">{cr.project_name || "Untitled"}</p>
