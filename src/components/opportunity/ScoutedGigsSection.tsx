@@ -22,6 +22,8 @@ import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { KretoMark } from "@/components/brand/KretoMark";
 import { SmartWidget } from "@/components/ui/smart-widget";
 import { OpportunitiesFeed } from "@/components/circle/OpportunitiesFeed";
+import { ScoutedCard } from "./scout/ScoutedCard";
+import { inferScoutCategory, inferEngagement, inferSeniority } from "@/lib/scoutCategory";
 
 interface ScoutedGig {
   id: string;
@@ -281,87 +283,40 @@ export function ScoutedGigsSection({ limit }: ScoutedGigsSectionProps = {}) {
     setOpenGig(null);
   };
 
-  const renderGigCard = (g: ScoutedGig) => {
+  // Everything a card needs, derived once: HD cover, a human context line,
+  // and the 3-4 facts that actually help someone decide.
+  const cardProps = (g: ScoutedGig) => {
+    const text = [g.title, g.description, g.full_description, g.company].filter(Boolean).join(" ");
+    const category = inferScoutCategory(text);
+    const engagement = inferEngagement(text);
+    const seniority = inferSeniority(text);
+    const subtitle = [category.label, g.company, seniority].filter(Boolean).join(" · ");
+    const tags = [
+      engagement,
+      hasRealCompensation(g.compensation) ? g.compensation!.trim() : null,
+    ].filter(Boolean) as string[];
     const Icon = SOURCE_ICON[g.source] || Globe;
-    return (
-      <div
-        onClick={() => openDetail(g)}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openDetail(g); } }}
-        aria-label={`View brief for ${g.title}`}
-        className="group relative h-full flex flex-col rounded-2xl overflow-hidden border border-border bg-card cursor-pointer transition-all hover:border-energy/40 hover:shadow-2xl hover:shadow-energy/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-energy"
-      >
-        <div className="relative aspect-[16/9] overflow-hidden shrink-0">
-          {g.image_url ? (
-            <img
-              src={g.image_url}
-              alt={g.title}
-              loading="lazy"
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-              onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-            />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-energy/30 via-primary/10 to-background flex items-center justify-center">
-              <Icon className="h-14 w-14 text-foreground/15" strokeWidth={1.5} />
-            </div>
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-
-          <div className="absolute top-2.5 left-2.5 right-2.5 flex items-start justify-between gap-2">
-            <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-background/80 backdrop-blur-sm border-border">
-              <Sparkles className="h-2.5 w-2.5 mr-1 text-energy" />
-              Scouted
-            </Badge>
-            <Badge className="h-5 text-[10px] bg-energy/15 text-energy border-energy/30 shrink-0">
-              {g.fit_score}% fit
-            </Badge>
-          </div>
-
-          <div className="absolute bottom-0 inset-x-0 p-3">
-            <h3 className="font-bold text-base leading-tight line-clamp-2 text-foreground">{g.title}</h3>
-          </div>
-        </div>
-
-        <div className="p-3 flex flex-col gap-2 flex-1">
-          {(g.company || g.location) && (
-            <div className="text-xs text-muted-foreground flex items-center gap-1.5 flex-wrap">
-              {g.company && <span className="font-medium text-foreground/90">{g.company}</span>}
-              {g.location && <><span>·</span><MapPin className="h-3 w-3" />{g.location}</>}
-              {g.remote && <Badge variant="outline" className="h-4 text-[9px] px-1">Remote</Badge>}
-            </div>
-          )}
-
-          {g.fit_reason && (
-            <div className="rounded-lg bg-energy/[0.06] border border-energy/20 px-2.5 py-2">
-              <div className="text-[9px] uppercase tracking-wider font-bold text-energy mb-0.5 flex items-center gap-1">
-                <Sparkles className="h-2.5 w-2.5" />
-                Why this fits you
-              </div>
-              <p className="text-[11px] leading-snug text-foreground/80 line-clamp-3">{g.fit_reason}</p>
-            </div>
-          )}
-
-          <div className="mt-auto flex items-center justify-between gap-2 pt-1">
-            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground min-w-0">
-              <Icon className="h-3 w-3 shrink-0" />
-              <span className="truncate">via {g.source_name || g.source}</span>
-              <span>·</span>
-              <span className="shrink-0">{formatDistanceToNow(new Date(g.scouted_at), { addSuffix: true }).replace("about ", "")}</span>
-            </div>
-            <div className="flex items-center gap-0.5 shrink-0" onClick={(e) => e.stopPropagation()}>
-              <Button size="icon" variant="ghost" className="h-7 w-7" onClick={(e) => save(g.id, e)} title="Save">
-                <Bookmark className="h-3.5 w-3.5" />
-              </Button>
-              <Button size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground" onClick={(e) => { e.stopPropagation(); dismiss(g.id); }} title="Dismiss">
-                <X className="h-3.5 w-3.5" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return {
+      title: g.title,
+      subtitle,
+      imageUrl: g.image_url || category.cover,
+      fallbackImageUrl: category.cover,
+      imageAlt: `Cover image for the ${category.label.toLowerCase()} gig “${g.title}”`,
+      tags,
+      fitScore: g.fit_score,
+      fitReason: g.fit_reason,
+      location: g.location,
+      remote: g.remote,
+      metaIcon: Icon,
+      metaLine: `via ${g.source_name || g.source} · ${formatDistanceToNow(new Date(g.scouted_at), { addSuffix: true }).replace("about ", "")}`,
+      onCtaClick: () => openDetail(g),
+      onSave: (e: React.MouseEvent) => save(g.id, e),
+      onDismiss: (e: React.MouseEvent) => { e.stopPropagation(); dismiss(g.id); },
+    };
   };
+
+  const renderGigCard = (g: ScoutedGig) => <ScoutedCard {...cardProps(g)} />;
+
 
   if (loading) {
     return (
@@ -434,7 +389,7 @@ export function ScoutedGigsSection({ limit }: ScoutedGigsSectionProps = {}) {
         <Carousel opts={{ align: "start", dragFree: true, duration: reducedMotion ? 0 : 20 }} className="w-full" aria-label="Scouted gigs">
           <CarouselContent className="-ml-3">
             {gigs.slice(0, limit).map((g) => (
-              <CarouselItem key={g.id} className="pl-3 basis-[85%] sm:basis-[60%]">
+              <CarouselItem key={g.id} className="pl-3 basis-[88%] sm:basis-[58%]">
                 {renderGigCard(g)}
               </CarouselItem>
             ))}
@@ -454,74 +409,16 @@ export function ScoutedGigsSection({ limit }: ScoutedGigsSectionProps = {}) {
         <>
         {/* One strongest opportunity first — gigs are already ordered by fit_score desc. */}
         {gigs[0] && (
-          <div
-            onClick={() => openDetail(gigs[0])}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openDetail(gigs[0]); } }}
-            aria-label={`View brief for ${gigs[0].title}, your strongest match`}
-            className="group relative rounded-2xl overflow-hidden border border-energy/30 bg-card cursor-pointer transition-all hover:border-energy/50 hover:shadow-2xl hover:shadow-energy/10 sm:flex focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-energy"
-          >
-            <div className="relative aspect-[16/9] sm:aspect-auto sm:w-64 shrink-0 overflow-hidden">
-              {gigs[0].image_url ? (
-                <img
-                  src={gigs[0].image_url}
-                  alt={gigs[0].title}
-                  loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-energy/30 via-primary/10 to-background flex items-center justify-center">
-                  {(() => { const Icon = SOURCE_ICON[gigs[0].source] || Globe; return <Icon className="h-14 w-14 text-foreground/15" strokeWidth={1.5} />; })()}
-                </div>
-              )}
-              <div className="absolute top-2.5 left-2.5">
-                <Badge variant="outline" className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 bg-background/80 backdrop-blur-sm border-border">
-                  Strongest match
-                </Badge>
-              </div>
-            </div>
-            <div className="p-4 flex flex-col gap-2.5 flex-1 min-w-0">
-              <div className="flex items-start justify-between gap-2">
-                <h3 className="font-bold text-lg leading-tight text-foreground">{gigs[0].title}</h3>
-                <Badge className="h-5 text-[10px] bg-energy/15 text-energy border-energy/30 shrink-0">
-                  {gigs[0].fit_score}% fit
-                </Badge>
-              </div>
-              {(gigs[0].company || gigs[0].location || hasRealCompensation(gigs[0].compensation)) && (
-                <div className="text-xs text-muted-foreground flex items-center gap-1.5 flex-wrap">
-                  {gigs[0].company && <span className="font-medium text-foreground/90">{gigs[0].company}</span>}
-                  {gigs[0].location && <><span>·</span><MapPin className="h-3 w-3" />{gigs[0].location}</>}
-                  {gigs[0].remote && <Badge variant="outline" className="h-4 text-[9px] px-1">Remote</Badge>}
-                  {hasRealCompensation(gigs[0].compensation) && <><span>·</span><span className="font-medium text-foreground/90">{gigs[0].compensation}</span></>}
-                </div>
-              )}
-              {gigs[0].fit_reason && (
-                <div className="rounded-lg bg-energy/[0.06] border border-energy/20 px-3 py-2">
-                  <div className="text-[9px] uppercase tracking-wider font-bold text-energy mb-0.5 flex items-center gap-1">
-                    <Sparkles className="h-2.5 w-2.5" />
-                    Why this fits you
-                  </div>
-                  <p className="text-xs leading-relaxed text-foreground/80">{gigs[0].fit_reason}</p>
-                </div>
-              )}
-              <div className="mt-auto flex items-center gap-2 pt-1" onClick={(e) => e.stopPropagation()}>
-                <Button size="sm" onClick={() => openDetail(gigs[0])} className="gap-1.5">
-                  View full brief
-                </Button>
-                <Button size="sm" variant="outline" onClick={(e) => save(gigs[0].id, e)} className="gap-1.5">
-                  <Bookmark className="h-3.5 w-3.5" />
-                  Save
-                </Button>
-                <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); dismiss(gigs[0].id); }} className="gap-1.5 text-muted-foreground">
-                  <X className="h-3.5 w-3.5" />
-                  Dismiss
-                </Button>
-              </div>
-            </div>
-          </div>
+          <ScoutedCard
+            {...cardProps(gigs[0])}
+            variant="feature"
+            priorityImage
+            ribbon="Strongest match"
+            ctaLabel="View full brief"
+            className="border-energy/30"
+          />
         )}
+
 
         {/* Everything else — carousel, not a card wall. */}
         {gigs.length > 1 && (
@@ -529,7 +426,7 @@ export function ScoutedGigsSection({ limit }: ScoutedGigsSectionProps = {}) {
             <Carousel setApi={setCarouselApi} opts={{ align: "start", dragFree: true, duration: reducedMotion ? 0 : 20 }} className="w-full" aria-label="More scouted gigs">
               <CarouselContent className="-ml-3">
                 {gigs.slice(1).map((g) => (
-                  <CarouselItem key={g.id} className="pl-3 basis-[85%] sm:basis-[46%] lg:basis-[31%]">
+                  <CarouselItem key={g.id} className="pl-3 basis-[88%] sm:basis-[52%] lg:basis-[34%]">
                     {renderGigCard(g)}
                   </CarouselItem>
                 ))}
