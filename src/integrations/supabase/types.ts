@@ -989,17 +989,21 @@ export type Database = {
           co_sign_suggestions: Json
           created_at: string
           created_by: string
+          decisions: Json
           duration_seconds: number | null
           error: string | null
           highlights: Json
           id: string
+          kreto_enabled: boolean
           language: string | null
           live_captions: Json
+          next_steps: Json
           participants: Json
           project_id: string | null
           recording_id: string | null
           recording_url: string | null
           status: string
+          suggested_projects: Json
           summary: string | null
           transcript: string | null
           updated_at: string
@@ -1012,17 +1016,21 @@ export type Database = {
           co_sign_suggestions?: Json
           created_at?: string
           created_by: string
+          decisions?: Json
           duration_seconds?: number | null
           error?: string | null
           highlights?: Json
           id?: string
+          kreto_enabled?: boolean
           language?: string | null
           live_captions?: Json
+          next_steps?: Json
           participants?: Json
           project_id?: string | null
           recording_id?: string | null
           recording_url?: string | null
           status?: string
+          suggested_projects?: Json
           summary?: string | null
           transcript?: string | null
           updated_at?: string
@@ -1035,17 +1043,21 @@ export type Database = {
           co_sign_suggestions?: Json
           created_at?: string
           created_by?: string
+          decisions?: Json
           duration_seconds?: number | null
           error?: string | null
           highlights?: Json
           id?: string
+          kreto_enabled?: boolean
           language?: string | null
           live_captions?: Json
+          next_steps?: Json
           participants?: Json
           project_id?: string | null
           recording_id?: string | null
           recording_url?: string | null
           status?: string
+          suggested_projects?: Json
           summary?: string | null
           transcript?: string | null
           updated_at?: string
