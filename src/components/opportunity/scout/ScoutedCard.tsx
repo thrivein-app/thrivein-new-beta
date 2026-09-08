@@ -147,15 +147,17 @@ export function ScoutedCard({
       )}
 
       {fitReason && (
-        <p
-          className={cn(
-            "rounded-xl border border-energy/20 bg-energy/[0.07] px-3 py-2 text-[12px] leading-snug text-foreground/85",
-            feature ? "line-clamp-3" : "line-clamp-2",
-          )}
-        >
-          <span className="font-semibold text-energy">Why you: </span>
-          {fitReason}
-        </p>
+        <div className="rounded-xl border border-energy/20 bg-energy/[0.07] px-3 py-2">
+          <p
+            className={cn(
+              "text-[12px] leading-snug text-foreground/85",
+              feature ? "line-clamp-3" : "line-clamp-2",
+            )}
+          >
+            <span className="font-semibold text-energy">Why you: </span>
+            {fitReason}
+          </p>
+        </div>
       )}
 
       <div className="mt-auto space-y-2.5 pt-1">
