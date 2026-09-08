@@ -524,11 +524,6 @@ const CreatorWorkHome = () => {
     return counts;
   })();
 
-  const visibleProjects = projects.filter((p) => {
-    if (folderFilter === "all") return true;
-    if (folderFilter === "unfiled") return !(p as any).studio_folder_id;
-    return (p as any).studio_folder_id === folderFilter;
-  });
 
   return (
     <PageTransition>
