@@ -1,7 +1,7 @@
 /**
  * KretoPresence — Kreto's lightweight, embodied visual presence.
- * Uses an optimized 16 KB render of the same owned character shown on the
- * Landing page, instead of the former abstract circle. Motion is limited to
+ * Uses an optimized render of the computer pose shown on the Landing page,
+ * instead of the former abstract circle or waving pose. Motion is limited to
  * compositor-friendly transforms and respects reduced-motion preferences.
  *
  * State is entirely caller-driven and never invented here: this component
@@ -16,7 +16,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { cn } from "@/lib/utils";
-import kretoMini from "@/assets/brand/kreto/kreto-mini.webp";
+import kretoComputerMini from "@/assets/brand/kreto/kreto-computer-mini.webp";
 
 export type KretoPresenceState =
   | "idle"
@@ -180,10 +180,10 @@ export const KretoPresence = ({
       transition={bodyTransition}
     >
       <img
-        src={kretoMini}
+        src={kretoComputerMini}
         alt=""
-        width={256}
-        height={317}
+        width={231}
+        height={256}
         decoding="async"
         draggable={false}
         className="absolute bottom-0 left-1/2 h-auto max-h-full w-auto max-w-full -translate-x-1/2 select-none object-contain drop-shadow-lg"
