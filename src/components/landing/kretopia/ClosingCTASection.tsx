@@ -37,6 +37,7 @@ import { ArrowRight } from "lucide-react";
 import { FixedProgressiveCard } from "@/components/landing/kretopia/FixedProgressiveCard";
 import { trackLandingCtaClick } from "@/lib/landingMetrics";
 import { supabase } from "@/integrations/supabase/client";
+import { KretoCharacter } from "@/components/brand/KretoCharacter";
 
 const ACCENT = "#FF2DA1";
 
@@ -89,13 +90,18 @@ export const ClosingCTASection = () => {
       style={{ backgroundColor: "#05070D" }}
       aria-labelledby="closing-cta-title"
     >
+      {/* Kreto waves the visitor off — the final, warmest appearance. */}
+      <div className="pointer-events-none absolute bottom-10 left-8 hidden xl:block opacity-45">
+        <KretoCharacter variant="main" size={168} floatAmplitude={0} />
+      </div>
+
       <FixedProgressiveCard
         eyebrow={<p className="landing-eyebrow">Get started</p>}
         title={
           <h2 id="closing-cta-title" className="landing-h1 landing-glow">
             {creatorCount ? `Join ${creatorCount}+ creatives` : "Join the creatives"}
             <br />
-            <span className="italic pink-glow-breathe" style={{ color: ACCENT }}>already proving their work.</span>
+            <span className="landing-accent">already proving their work.</span>
           </h2>
         }
         keyValue={

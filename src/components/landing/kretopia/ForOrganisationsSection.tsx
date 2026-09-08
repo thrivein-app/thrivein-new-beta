@@ -14,6 +14,7 @@ import { Search, IdCard, Megaphone, Users2, CheckCircle2, Briefcase, Handshake }
 import { Button } from "@/components/ui/button";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { trackLandingCtaClick } from "@/lib/landingMetrics";
+import { KretoCharacter } from "@/components/brand/KretoCharacter";
 
 const ACCENT = "#FF2DA1";
 
@@ -35,6 +36,10 @@ export const ForOrganisationsSection = () => {
       style={{ backgroundColor: "#05070D" }}
       aria-labelledby="for-orgs-title"
     >
+      <div className="pointer-events-none absolute top-8 right-8 hidden xl:block opacity-35">
+        <KretoCharacter variant="connector" size={124} floatAmplitude={0} />
+      </div>
+
       <div className="relative mx-auto max-w-[1320px] px-5 sm:px-8 lg:px-12">
         <motion.div
           initial={reducedMotion ? false : { opacity: 0, y: 14 }}
@@ -45,7 +50,8 @@ export const ForOrganisationsSection = () => {
         >
           <p className="landing-eyebrow mb-4">Hiring creative talent?</p>
           <h2 id="for-orgs-title" className="landing-h2 landing-glow">
-            Find people through the work they've actually done.
+            Find people through{" "}
+            <span className="landing-accent">the work they've actually done.</span>
           </h2>
           <p className="landing-sub mt-4 max-w-xl">
             Kretopia helps hotels, agencies, festivals, production companies, brands and creative teams discover talent through verified creative context, not just profiles and follower counts.

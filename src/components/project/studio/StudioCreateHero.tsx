@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Mic, FileText, ListChecks, Receipt, Sparkles } from "lucide-react";
 import { CtaButton } from "@/components/ui/cta-button";
-import { Button } from "@/components/ui/button";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 interface StudioCreateHeroProps {
@@ -100,56 +99,50 @@ export const StudioCreateHero = ({ onCreate, onVoice, projectCount, activeCount 
           </div>
         </div>
 
-        {/* Live prompt line — the New Room's own input, previewed */}
-        <button
-          type="button"
-          onClick={onCreate}
-          aria-label="Open the New Room"
-          className="group mt-6 flex w-full items-center gap-3 rounded-2xl border px-4 py-3.5 text-left transition-colors hover:border-[hsl(var(--energy)/0.45)]"
+        {/* One entry point. The prompt line IS the CTA — the primary action
+            sits inside it, so there is no competing second big button and no
+            second mic. Voice is a typographic secondary underneath. */}
+        <div
+          className="group mt-6 rounded-2xl border p-2 transition-colors focus-within:border-[hsl(var(--energy)/0.55)] hover:border-[hsl(var(--energy)/0.45)]"
           style={{ borderColor: "hsl(var(--energy) / 0.22)", backgroundColor: "rgba(255,255,255,0.03)" }}
         >
-          <span
-            aria-hidden
-            className="grid h-8 w-8 shrink-0 place-items-center rounded-full"
-            style={{ backgroundColor: "hsl(var(--energy) / 0.14)" }}
-          >
-            <Mic className="h-4 w-4" style={{ color: "hsl(var(--energy))" }} />
-          </span>
-          <span className="min-w-0 flex-1 overflow-hidden">
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.span
-                key={promptIndex}
-                initial={reducedMotion ? false : { opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={reducedMotion ? undefined : { opacity: 0, y: -6 }}
-                transition={{ duration: 0.32, ease: [0.2, 0.65, 0.3, 0.95] }}
-                className="block truncate text-sm text-white/70"
-              >
-                “{PROMPTS[promptIndex]}”
-              </motion.span>
-            </AnimatePresence>
-          </span>
-          <ArrowRight
-            className="h-4 w-4 shrink-0 text-white/40 transition-transform group-hover:translate-x-1"
-            aria-hidden
-          />
-        </button>
-
-        <div className="mt-5 flex flex-col sm:flex-row gap-3">
-          <CtaButton onClick={onCreate} data-testid="studio-create-project">
-            Open a New Room
-            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </CtaButton>
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={onVoice}
-            className="w-full sm:w-auto gap-2 bg-transparent hover:bg-white/10 border-white/15 text-white"
-          >
-            <Mic className="h-4 w-4" aria-hidden />
-            Describe it out loud
-          </Button>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <button
+              type="button"
+              onClick={onCreate}
+              aria-label="Open the New Room"
+              className="flex min-w-0 flex-1 items-center gap-3 rounded-xl px-3 py-3 text-left"
+            >
+              <span className="min-w-0 flex-1 overflow-hidden">
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.span
+                    key={promptIndex}
+                    initial={reducedMotion ? false : { opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={reducedMotion ? undefined : { opacity: 0, y: -6 }}
+                    transition={{ duration: 0.32, ease: [0.2, 0.65, 0.3, 0.95] }}
+                    className="block truncate text-sm text-white/60"
+                  >
+                    &ldquo;{PROMPTS[promptIndex]}&rdquo;
+                  </motion.span>
+                </AnimatePresence>
+              </span>
+            </button>
+            <CtaButton onClick={onCreate} data-testid="studio-create-project" className="shrink-0 sm:w-auto">
+              Open a New Room
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </CtaButton>
+          </div>
         </div>
+
+        <button
+          type="button"
+          onClick={onVoice}
+          className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-white/50 underline decoration-white/20 underline-offset-4 transition-colors hover:text-white/80"
+        >
+          <Mic className="h-3.5 w-3.5" aria-hidden />
+          Or describe it out loud
+        </button>
 
         <p className="mt-3 text-xs text-white/40">
           {projectCount === 0

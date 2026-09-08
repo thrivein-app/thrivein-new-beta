@@ -557,21 +557,31 @@ const ProfileContent = () => {
           </div>
         )}
 
-        {/* Owner tools — preview public Passport + private dashboard */}
-        <div className="mt-3 flex items-center gap-2">
+        {/* One entry point, not two competing buttons. A single segmented
+            control reads as "which view of my Passport am I looking at",
+            which is what these two destinations actually are — the public
+            record and the private dashboard behind it. */}
+        <div
+          role="group"
+          aria-label="Passport view"
+          className="mt-3 flex items-center gap-1 rounded-full border border-border bg-card p-1"
+        >
+          <span className="flex-1 rounded-full bg-primary px-3 py-1.5 text-center text-[11px] font-semibold text-primary-foreground">
+            My Passport
+          </span>
           <button
             type="button"
-            onClick={() => window.open(`/profile/${profile?.user_id}`, '_blank', 'noopener')}
-            className="btn-glass btn-glass-outline flex-1 text-[11px] py-1.5 rounded-full"
+            onClick={() => window.open(`/profile/${profile?.user_id}`, "_blank", "noopener")}
+            className="flex-1 rounded-full px-3 py-1.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
           >
-            Preview public Passport ↗
+            Public view ↗
           </button>
           <button
             type="button"
-            onClick={() => navigate('/dashboard')}
-            className="btn-glass btn-glass-outline flex-1 text-[11px] py-1.5 rounded-full"
+            onClick={() => navigate("/dashboard")}
+            className="flex-1 rounded-full px-3 py-1.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
           >
-            Private dashboard →
+            Dashboard →
           </button>
         </div>
 

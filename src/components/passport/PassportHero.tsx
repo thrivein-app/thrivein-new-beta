@@ -12,6 +12,7 @@ import { TrustSignals } from "@/components/profile/TrustSignals";
 import { SocialStatsInline } from "@/components/profile/SocialStatsInline";
 import type { Standing } from "@/lib/passport/standing";
 import { cn } from "@/lib/utils";
+import { passportId as makePassportId } from "@/lib/passportId";
 
 interface HeroCredit {
   project_name: string;
@@ -67,10 +68,7 @@ export function PassportHero({
   onRefresh,
 }: PassportHeroProps) {
   const displayName = profile.full_name;
-  const passportId = useMemo(
-    () => (profile.user_id ? `THR-${profile.user_id.replace(/-/g, "").slice(0, 5).toUpperCase()}` : "THR-—"),
-    [profile.user_id],
-  );
+  const passportId = useMemo(() => makePassportId(profile.user_id), [profile.user_id]);
 
   // Passport Strength — the one progress meter on this card. Same inputs
   // PassportCommandCenter used to compute independently; now computed once,

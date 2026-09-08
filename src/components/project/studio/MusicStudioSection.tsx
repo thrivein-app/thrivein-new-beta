@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { StudioEmptyState } from "./primitives";
 
 interface Props { project: any; currentUserId: string; }
 
@@ -304,10 +305,11 @@ export function MusicStudioSection({ project, currentUserId }: Props) {
             <Plus className="h-3.5 w-3.5 mr-1" /> Add track
           </Button>
           {tracks.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border/80 p-5 text-center">
-              <p className="text-sm font-semibold">No tracks yet</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Add your first track to start building the release.</p>
-            </div>
+            <StudioEmptyState
+              compact
+              title="No tracks yet"
+              description="Add your first track to start building the release."
+            />
           ) : (
             <ul className="space-y-2">
               {tracks.map((t) => (
@@ -415,10 +417,11 @@ export function MusicStudioSection({ project, currentUserId }: Props) {
             </Button>
           </div>
           {checklist.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-border/80 p-5 text-center">
-              <p className="text-sm font-semibold">No checklist yet</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Generate a full release plan with one tap.</p>
-            </div>
+            <StudioEmptyState
+              compact
+              title="No checklist yet"
+              description="Generate a full release plan with one tap."
+            />
           ) : (
             <ul className="space-y-1.5">
               {checklist.map((c) => (

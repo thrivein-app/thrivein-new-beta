@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sparkles, Loader2, Users, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { StudioEmptyState, StudioLoadingState } from "./primitives";
 
 interface Props {
   project: any;
@@ -117,16 +118,14 @@ export const EventGuestMatchesSection = ({ project, currentUserId }: Props) => {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-6 text-muted-foreground text-sm">
-          <Loader2 className="h-4 w-4 animate-spin mr-2" /> Loading…
-        </div>
+        <StudioLoadingState rows={3} />
       ) : matches.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-border/60 p-5 text-center">
-          <Users className="h-6 w-6 mx-auto text-muted-foreground/60 mb-2" />
-          <p className="text-sm text-muted-foreground">
-            No matches yet. Once at least 2 guests have RSVP'd, generate Smart Matches to surface the best intros.
-          </p>
-        </div>
+        <StudioEmptyState
+          compact
+          icon={<Users className="h-6 w-6" />}
+          title="No matches yet"
+          description="Once at least 2 guests have RSVP'd, generate Smart Matches to surface the best intros."
+        />
       ) : (
         <div className="space-y-2.5">
           {matches.map(m => {

@@ -82,7 +82,7 @@ export const VerifiedCreditsChapterSection = () => {
 
             <h2 id="verified-credits-title" className="landing-h2 landing-glow">
               Confirm the work that{" "}
-              <span className="italic pink-glow-breathe" style={{ color: ACCENT }}>proves your experience</span>.
+              <span className="landing-accent">proves your experience</span>.
             </h2>
 
             <p className="landing-sub mt-6 max-w-xl">

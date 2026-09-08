@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import { Fingerprint, Radar, Users, Clapperboard, CheckCircle2, Sparkles, RotateCw } from "lucide-react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { analytics } from "@/lib/analytics";
+import { KretoCharacter } from "@/components/brand/KretoCharacter";
 
 const ACCENT = "#FF2DA1";
 
@@ -40,6 +41,11 @@ export const ProductLoopSection = () => {
       style={{ backgroundColor: "#05070D" }}
       aria-labelledby="product-loop-title"
     >
+      {/* Kreto, peripheral — the loop's quiet operator. Desktop only. */}
+      <div className="pointer-events-none absolute bottom-6 right-6 hidden xl:block opacity-40">
+        <KretoCharacter variant="producer" size={132} floatAmplitude={0} />
+      </div>
+
       <div className="relative mx-auto max-w-[1320px]">
         <motion.div
           initial={reducedMotion ? false : { opacity: 0, y: 14 }}
@@ -50,7 +56,8 @@ export const ProductLoopSection = () => {
         >
           <p className="landing-eyebrow mb-4">Your Passport does more</p>
           <h2 id="product-loop-title" className="landing-h2 landing-glow">
-            Your past work should help create your next opportunity.
+            Your past work should help create{" "}
+            <span className="landing-accent">your next opportunity.</span>
           </h2>
           <p className="landing-sub mt-5">
             As your Passport grows, Kretopia understands more about what you do, who you've worked with and where you want to go next. That powers everything around it.

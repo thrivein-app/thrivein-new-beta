@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { CreativeLoader } from "@/components/ui/creative-loader";
 import { useParams, useSearchParams } from "react-router-dom";
-import { Loader2, Menu, X, PanelRightOpen, PanelLeftClose, PanelLeftOpen, FolderKanban } from "lucide-react";
+import { FolderKanban } from "lucide-react";
 import { ProjectSettingsMenu } from "@/components/project/ProjectSettingsMenu";
 import { SimpleProjectHeader } from "@/components/project/SimpleProjectHeader";
-import { WorkspaceSidebar } from "@/components/project/WorkspaceSidebar";
+import { DeskShell } from "@/components/project/desk/DeskShell";
+import { DeskSidebar } from "@/components/project/desk/DeskSidebar";
+import { DeskTopbar } from "@/components/project/desk/DeskTopbar";
+import { DeskWorkspace } from "@/components/project/desk/DeskWorkspace";
 import { WorkspaceQuickPanel } from "@/components/project/WorkspaceQuickPanel";
 import { StudioToolBar } from "@/components/project/StudioToolBar";
 import { ConfirmCreditBanner } from "@/components/project/ConfirmCreditBanner";
@@ -15,20 +17,17 @@ import { StudioCreatedAcknowledgement } from "@/components/project/studio/Studio
 import { DeskTabContent } from "@/components/project/DeskTabContent";
 import { useAgentRole } from "@/hooks/useAgentRole";
 
-import { MobileProjectHub } from "@/components/project/mobile/MobileProjectHub";
 import { StudioRoom } from "@/components/project/studio/StudioRoom";
 import { StudioPhaseRail } from "@/components/project/studio/StudioPhaseRail";
 import { ProjectCompleteDialog } from "@/components/project/studio/ProjectCompleteDialog";
 import { DeskCommandPalette } from "@/components/desk/DeskCommandPalette";
 import { VoiceCommandSheet } from "@/components/desk/VoiceCommandSheet";
-import { ArrowLeft } from "lucide-react";
 import { useProjectData } from "@/hooks/useProjectData";
 import { useProjectFlow, PROJECT_FLOW_STAGES, STUDIO_PHASES, stageToPhase, type ProjectFlowStageId } from "@/hooks/useProjectFlow";
 import { useProjectFlowExtras } from "@/hooks/useProjectFlowExtras";
 import { notifyPhaseAdvanced } from "@/lib/notifyPhaseAdvanced";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 const ThriveDesk = () => {
   const { projectId } = useParams();
@@ -47,7 +46,15 @@ const ThriveDesk = () => {
   useEffect(() => {
     localStorage.setItem("thrivedesk:sidebar-open", String(desktopSidebarOpen));
   }, [desktopSidebarOpen]);
-  const [quickPanelOpen, setQuickPanelOpen] = useState(true);
+  // Simplified default: the quick panel is a power-user affordance, opt-in
+  // and remembered, rather than pushed at every user on first load.
+  const [quickPanelOpen, setQuickPanelOpen] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("thrivedesk:quick-panel") === "true";
+  });
+  useEffect(() => {
+    localStorage.setItem("thrivedesk:quick-panel", String(quickPanelOpen));
+  }, [quickPanelOpen]);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [voiceCmdOpen, setVoiceCmdOpen] = useState(false);
   const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
@@ -240,171 +247,127 @@ const ThriveDesk = () => {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row overflow-hidden bg-background h-[calc(100dvh-4rem)] pb-[calc(6.5rem+env(safe-area-inset-bottom))] touch-pan-y lg:h-[100dvh] lg:pb-0">
-      {/* Mobile sidebar overlay */}
-      {sidebarOpen && (
-        <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={() => setSidebarOpen(false)} />
-      )}
-
-      {/* Left Sidebar - Project List */}
-      <div className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transform transition-all duration-200 lg:relative",
-        sidebarOpen ? "translate-x-0" : "-translate-x-full",
-        "lg:translate-x-0",
-        desktopSidebarOpen ? "lg:w-64" : "lg:w-0 lg:border-r-0 lg:overflow-hidden"
-      )}>
-        <WorkspaceSidebar
+    <DeskShell
+      mobileSidebarOpen={sidebarOpen}
+      onCloseMobileSidebar={() => setSidebarOpen(false)}
+      sidebar={
+        <DeskSidebar
           projects={projects}
           activeProjectId={projectId}
+          open={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
+          expanded={desktopSidebarOpen}
+          onExpand={() => setDesktopSidebarOpen(true)}
           onProjectCreated={fetchProjects}
         />
-      </div>
-
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 min-h-0">
-        {/* Workspace Header */}
-        <header className="h-14 border-b-2 border-primary/20 bg-card flex items-center gap-3 px-4 shrink-0 shadow-sm">
-          <Button variant="ghost" size="icon" className="lg:hidden shrink-0" onClick={() => setSidebarOpen(true)}>
-            <Menu className="h-5 w-5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="hidden lg:inline-flex shrink-0"
-            onClick={() => setDesktopSidebarOpen((v) => !v)}
-            aria-label={desktopSidebarOpen ? "Hide studios" : "Show studios"}
-            title={desktopSidebarOpen ? "Hide studios" : "Show studios"}
-          >
-            {desktopSidebarOpen ? <PanelLeftClose className="h-5 w-5" /> : <PanelLeftOpen className="h-5 w-5" />}
-          </Button>
-          <SimpleProjectHeader
-            project={project}
-            collaborators={collaborators}
-            onCollaboratorsChanged={fetchProjectData}
-            compact
-          />
-          <ProjectSettingsMenu
-            project={project}
-            collaborators={collaborators}
-            currentUserId={user?.id || ""}
-            isPro={isPro}
-            onProjectUpdated={fetchProjectData}
-            onNavigateToTab={setActiveTab}
-          />
-        </header>
-
-        {/* Phase rail — a real header row (not a sticky trick over a
-            scrolling child), so it's genuinely always visible: same
-            instance across every tab, including rolling back to an
-            earlier one, instead of only existing on the "today" tab and
-            vanishing the moment its own markers navigate you elsewhere. */}
-        <div className="bg-background/95 backdrop-blur-xl border-b border-border/60 shrink-0">
-          <StudioPhaseRail
-            flow={flow}
-            onPhaseClick={goToTabWithIntent}
-            onPinStage={handlePinStage}
-            onValidateStep={handleValidateStep}
-          />
-        </div>
-
-        {/* Unified tool bar — same on mobile and desktop when drilled into a tool */}
-        {!isStudioRoom && (
-          <StudioToolBar
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-            workspaceType={project?.workspace_type ?? "general"}
-            dealType={project?.deal_type ?? "paid"}
-            taskCount={tasks.filter(t => t.status !== 'done').length}
-            messageCount={messages.length}
-          />
-        )}
-
-        {/* Kreto's one-time "Studio is ready" acknowledgement — only when
-            New Room's real navigate() call included the confirmation flag
-            (KRETO_NEW_ROOM_INTEGRATION_REPORT.md); a no-op on every other
-            visit to this route, including a refresh of this same one. */}
-        <StudioCreatedAcknowledgement />
-
-        {/* Agent Mode Banner — visible when agent_mode is true */}
-        <AgentModeBanner agentRole={agentRole} />
-
-        {/* Pending invite — accept inline */}
-        <ProjectInviteAcceptBanner projectId={projectId!} onAccepted={fetchProjectData} />
-
-        {/* Credit Confirmation Banner — only when project opted-in to credits */}
-        {(project as any)?.track_as_credit && (
-          <ConfirmCreditBanner
-            projectId={projectId!}
-            projectTitle={project.title}
-            onConfirmed={fetchProjectData}
-          />
-        )}
-
-        {/* Content + Quick Panel */}
-        <div className="flex-1 flex min-h-0 overflow-hidden">
-          {isStudioRoom ? (
-            <StudioRoom
-              project={project}
-              tasks={tasks}
-              files={files}
-              collaborators={collaborators as any}
-              currentUserId={user?.id || ""}
-              onUpdated={fetchProjectData}
-              onNavigateToTab={goToTabWithIntent}
-              flow={flow}
-            />
-          ) : (
-            <DeskTabContent
-              activeTab={activeTab}
-              projectId={projectId!}
-              project={project}
-              messages={messages}
-              tasks={tasks}
-              files={files}
-              milestones={milestones}
-              collaborators={collaborators}
-              currentUserId={user?.id || ""}
-              userRole={userRole}
-              isPro={isPro}
-              agentRole={agentRole}
-              onUpdate={fetchProjectData}
-            />
-          )}
-
-          {/* Quick Panel Toggle - Desktop only, hidden in Studio */}
-          {!isStudioRoom && !quickPanelOpen && (
-            <div className="hidden xl:flex items-start pt-3 pr-2 shrink-0">
-              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setQuickPanelOpen(true)}>
-                <PanelRightOpen className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
-
-          {/* Right Quick Panel - Desktop only, hidden in Studio */}
-          {!isStudioRoom && quickPanelOpen && (
-            <div className="hidden xl:block w-80 border-l border-border bg-card/30 overflow-y-auto shrink-0">
-              <div className="flex items-center justify-between px-4 pt-3 pb-1">
-                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Quick Panel</span>
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setQuickPanelOpen(false)}>
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-              <WorkspaceQuickPanel
-                tasks={tasks}
-                files={files}
+      }
+    >
+      <DeskWorkspace
+        topbar={
+          <DeskTopbar
+            onOpenMobileSidebar={() => setSidebarOpen(true)}
+            sidebarExpanded={desktopSidebarOpen}
+            onToggleSidebar={() => setDesktopSidebarOpen((v) => !v)}
+            actions={
+              <ProjectSettingsMenu
+                project={project}
                 collaborators={collaborators}
-                projectId={projectId!}
-                onTasksChanged={fetchProjectData}
                 currentUserId={user?.id || ""}
+                isPro={isPro}
+                onProjectUpdated={fetchProjectData}
                 onNavigateToTab={setActiveTab}
               />
+            }
+          >
+            <SimpleProjectHeader
+              project={project}
+              collaborators={collaborators}
+              onCollaboratorsChanged={fetchProjectData}
+              compact
+            />
+          </DeskTopbar>
+        }
+        rails={
+          <>
+            {/* Phase rail — a real header row (not a sticky trick over a
+                scrolling child), so it stays visible across every tab. */}
+            <div className="shrink-0 border-b border-border/60 bg-background">
+              <StudioPhaseRail
+                flow={flow}
+                onPhaseClick={goToTabWithIntent}
+                onPinStage={handlePinStage}
+                onValidateStep={handleValidateStep}
+              />
             </div>
-          )}
-        </div>
-      </div>
 
-      {/* Kreto is mounted globally via ThriveAgentFab — no per-page launcher needed. */}
+            {!isStudioRoom && (
+              <StudioToolBar
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                workspaceType={project?.workspace_type ?? "general"}
+                dealType={project?.deal_type ?? "paid"}
+                taskCount={tasks.filter((t) => t.status !== "done").length}
+                messageCount={messages.length}
+              />
+            )}
+
+            <StudioCreatedAcknowledgement />
+            <AgentModeBanner agentRole={agentRole} />
+            <ProjectInviteAcceptBanner projectId={projectId!} onAccepted={fetchProjectData} />
+            {(project as any)?.track_as_credit && (
+              <ConfirmCreditBanner
+                projectId={projectId!}
+                projectTitle={project.title}
+                onConfirmed={fetchProjectData}
+              />
+            )}
+          </>
+        }
+        quickPanelOpen={quickPanelOpen}
+        onQuickPanelOpenChange={setQuickPanelOpen}
+        quickPanel={
+          isStudioRoom ? undefined : (
+            <WorkspaceQuickPanel
+              tasks={tasks}
+              files={files}
+              collaborators={collaborators}
+              projectId={projectId!}
+              onTasksChanged={fetchProjectData}
+              currentUserId={user?.id || ""}
+              onNavigateToTab={setActiveTab}
+            />
+          )
+        }
+      >
+        {isStudioRoom ? (
+          <StudioRoom
+            project={project}
+            tasks={tasks}
+            files={files}
+            collaborators={collaborators as any}
+            currentUserId={user?.id || ""}
+            onUpdated={fetchProjectData}
+            onNavigateToTab={goToTabWithIntent}
+            flow={flow}
+          />
+        ) : (
+          <DeskTabContent
+            activeTab={activeTab}
+            projectId={projectId!}
+            project={project}
+            messages={messages}
+            tasks={tasks}
+            files={files}
+            milestones={milestones}
+            collaborators={collaborators}
+            currentUserId={user?.id || ""}
+            userRole={userRole}
+            isPro={isPro}
+            agentRole={agentRole}
+            onUpdate={fetchProjectData}
+          />
+        )}
+      </DeskWorkspace>
 
       {/* Global ⌘K palette + voice command — available across the workspace */}
       <DeskCommandPalette
@@ -418,7 +381,7 @@ const ThriveDesk = () => {
         onOpenChange={setCompleteDialogOpen}
         projectTitle={project.title}
       />
-    </div>
+    </DeskShell>
   );
 };
 

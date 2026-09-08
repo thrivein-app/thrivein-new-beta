@@ -7,6 +7,7 @@ import { toast as sonnerToast } from "sonner";
 import { cn } from "@/lib/utils";
 import { MoodboardThumb } from "./MoodboardThumb";
 import { DeliverableCommentsSheet } from "./DeliverableCommentsSheet";
+import { StudioLoadingState } from "./primitives";
 
 interface DeliverablesSectionProps {
   projectId: string;
@@ -182,9 +183,7 @@ export const DeliverablesSection = ({
         </header>
 
         {loading ? (
-          <div className="flex items-center justify-center py-6">
-            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-          </div>
+          <StudioLoadingState rows={3} />
         ) : (
           <div className="space-y-2.5">
             {items.map((d) => {

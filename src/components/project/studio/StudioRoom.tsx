@@ -231,20 +231,29 @@ export const StudioRoom = ({
         isOwner={isOwner}
         onIngested={onUpdated}
       />
-      <div className="px-4 pt-2">
-        <ImportedSourcesCard projectId={project.id} />
-      </div>
-      {/* Phase E — outcome composer: free-text → routed capability */}
+      {/* Phase E — outcome composer: free-text → routed capability. This is
+          the only always-visible action under the Drop Zone. */}
       {isOwner && (
         <StudioOutcomeComposer projectId={project.id} projectTitle={project.title ?? "this project"} />
       )}
-      {/* Brand + Brain — what Thrive knows and how it'll style every output */}
+      {/* Declutter: imported sources + brand/brain chips are reference
+          material, not a daily action, so they sit behind one quiet
+          disclosure instead of three permanent blocks at the top of the
+          room. Native <details> — no extra state, no extra render cost. */}
       {isOwner && (
-        <div className="px-4 pt-2 flex items-center gap-2 flex-wrap">
-          <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground w-full sm:w-auto">Thrive uses</span>
-          <BrandVaultChip projectId={project.id} />
-          <StudioBrainPanel projectId={project.id} isOwner={isOwner} />
-        </div>
+        <details className="group px-4 pt-2">
+          <summary className="cursor-pointer list-none inline-flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground transition-colors">
+            What Kreto knows
+            <span aria-hidden className="transition-transform group-open:rotate-90">›</span>
+          </summary>
+          <div className="mt-3 space-y-3">
+            <ImportedSourcesCard projectId={project.id} />
+            <div className="flex flex-wrap items-center gap-2">
+              <BrandVaultChip projectId={project.id} />
+              <StudioBrainPanel projectId={project.id} isOwner={isOwner} />
+            </div>
+          </div>
+        </details>
       )}
     </>
   );
@@ -620,10 +629,9 @@ export const StudioRoom = ({
               )}
             </>
           )}
-          <div className="flex items-center justify-between px-1">
-            <p className="text-[11px] text-muted-foreground/70">
-              Tip: hover any section and drag the handle to reorder your studio.
-            </p>
+          {/* Declutter: the permanent "drag the handle" tip is removed — the
+              handle already appears on hover. Only the recovery action stays. */}
+          <div className="flex items-center justify-end px-1">
             <button
               type="button"
               onClick={resetLayout}
