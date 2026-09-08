@@ -56,13 +56,13 @@ describe("KretoPresence", () => {
     expect(screen.getByText(label)).toHaveClass("sr-only");
   });
 
-  it("renders the real KretoMark badge at compact/card/hero/full sizes but not at micro", () => {
+  it("renders the optimized Kreto character at every supported size", () => {
     const { container: micro } = render(<KretoPresence size="micro" />);
     const { container: compact } = render(<KretoPresence size="compact" />);
     const { container: card } = render(<KretoPresence size="card" />);
     const { container: hero } = render(<KretoPresence size="hero" />);
     const { container: full } = render(<KretoPresence size="full" />);
-    expect(micro.querySelector("img")).not.toBeInTheDocument();
+    expect(micro.querySelector("img")).toBeInTheDocument();
     expect(compact.querySelector("img")).toBeInTheDocument();
     expect(card.querySelector("img")).toBeInTheDocument();
     expect(hero.querySelector("img")).toBeInTheDocument();
@@ -92,9 +92,8 @@ describe("KretoPresence", () => {
     reducedMotion = false;
   });
 
-  it("renders exactly one signal-dot circle regardless of state", () => {
+  it("renders a single state badge when Kreto is processing", () => {
     const { container } = render(<KretoPresence state="processing" />);
-    // One "signal" circle plus its outline stroke circle = 2 <circle> elements.
-    expect(container.querySelectorAll("circle")).toHaveLength(2);
+    expect(container.querySelectorAll("span[aria-hidden]")).toHaveLength(1);
   });
 });

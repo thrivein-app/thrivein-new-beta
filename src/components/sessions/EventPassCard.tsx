@@ -64,13 +64,9 @@ export const EventPassCard = ({
           <div className="border-t border-dashed border-border mx-3 mt-1.5" />
         </div>
 
-        {/* QR — the priority element on the card, framed with the same ambient-glow + scan-line signature used across Kretopia's AI-powered surfaces */}
+        {/* QR — the priority element on the card, framed with a restrained ambient glow. */}
         <div className="relative px-5 pt-5 pb-2">
           <div aria-hidden className="passport-qr-glow pointer-events-none absolute -inset-x-2 top-2 h-64 rounded-[32px] blur-2xl opacity-70 ai-ambient-breathe" />
-          <div aria-hidden className="pointer-events-none absolute inset-x-8 top-3 h-px overflow-hidden rounded-full">
-            <div className="holo-card-scan h-full w-1/3" />
-          </div>
-
           <div className="relative flex flex-col items-center">
             {loading ? (
               <div className="flex h-[264px] w-[264px] items-center justify-center rounded-2xl border border-border bg-muted/40">

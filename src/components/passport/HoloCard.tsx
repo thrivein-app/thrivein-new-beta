@@ -15,8 +15,7 @@ export function HoloCard({ children, className, maxTilt = 6 }: HoloCardProps) {
   const [glare, setGlare] = useState({ x: 50, y: 50, on: false });
   const [inView, setInView] = useState(true);
 
-  // The ambient glow and scan-line are continuous decorative animations —
-  // stop them when the card scrolls offscreen so they don't run forever.
+  // Pause the subtle ambient depth when the card scrolls offscreen.
   useEffect(() => {
     const el = ref.current;
     if (!el || typeof IntersectionObserver === "undefined") return;
@@ -73,10 +72,6 @@ export function HoloCard({ children, className, maxTilt = 6 }: HoloCardProps) {
         />
 
         <div className="holo-card-frame relative h-full overflow-hidden rounded-2xl">
-          <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-30 h-px overflow-hidden">
-            <div className="holo-card-scan h-full w-2/5" style={{ animationPlayState: inView ? "running" : "paused" }} />
-          </div>
-
           <div className="relative z-10 h-full [transform:translateZ(1px)]">{children}</div>
 
           {/* Pointer-following optical foil, strongest only while engaged. */}

@@ -53,10 +53,8 @@ export function KretoLauncher() {
       aria-label="Open Kreto"
       title="Open Kreto"
       className={cn(
-        "hidden lg:flex fixed z-40 items-center justify-center h-14 w-14 rounded-full",
-        "bg-[#0B0B10]/90 border border-white/12 backdrop-blur-sm",
-        "shadow-[0_10px_28px_-10px_rgba(0,0,0,0.7)]",
-        "hover:border-white/25 hover:scale-105 active:scale-95",
+        "hidden lg:flex fixed z-40 items-end justify-center h-20 w-16",
+        "hover:scale-105 active:scale-95",
         "transition-transform duration-200 motion-reduce:transition-none motion-reduce:hover:scale-100",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
       )}
@@ -65,7 +63,7 @@ export function KretoLauncher() {
         bottom: "max(1.25rem, env(safe-area-inset-bottom))",
       }}
     >
-      <KretoPresence size="compact" state="idle" />
+      <KretoPresence size="card" state="idle" />
       <span className="sr-only">Open Kreto</span>
     </button>
   );
