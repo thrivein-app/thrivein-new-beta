@@ -387,15 +387,6 @@ const CreatorWorkHome = () => {
   const [recentCollaborators, setRecentCollaborators] = useState<
     { id: string; full_name: string; avatar_url: string | null; role: string | null }[]
   >([]);
-  const [collabApi, setCollabApi] = useState<CarouselApi>();
-  const [reducedMotion, setReducedMotion] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReducedMotion(mq.matches);
-    const onChange = () => setReducedMotion(mq.matches);
-    mq.addEventListener?.("change", onChange);
-    return () => mq.removeEventListener?.("change", onChange);
-  }, []);
 
   const fetchFolders = async () => {
     if (!user) return;
