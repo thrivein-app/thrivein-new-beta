@@ -34,11 +34,11 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { cn } from "@/lib/utils";
-import kretoMain from "@/assets/brand/kreto/kreto-main.jpg";
-import kretoScout from "@/assets/brand/kreto/kreto-scout.jpg";
-import kretoConnector from "@/assets/brand/kreto/kreto-connector.jpg";
-import kretoProducer from "@/assets/brand/kreto/kreto-producer.jpg";
-import kretoPublicist from "@/assets/brand/kreto/kreto-publicist.jpg";
+import kretoMain from "@/assets/brand/kreto/kreto-main-cutout.png";
+import kretoScout from "@/assets/brand/kreto/kreto-scout-cutout.png";
+import kretoConnector from "@/assets/brand/kreto/kreto-connector-cutout.png";
+import kretoProducer from "@/assets/brand/kreto/kreto-producer-cutout.png";
+import kretoPublicist from "@/assets/brand/kreto/kreto-publicist-cutout.png";
 
 export type KretoCharacterVariant = "main" | "scout" | "connector" | "producer" | "publicist";
 export type KretoCharacterState =
@@ -183,22 +183,29 @@ export const KretoCharacter = ({
       onHoverEnd={handleHoverEnd}
       aria-hidden="true"
     >
+      {/* Alpha-cut PNG renders: no rectangle, no tile, no mask fade. The
+          character is the shape. A soft elliptical contact shadow is drawn
+          underneath so the figure sits in the scene instead of floating. */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 -translate-x-1/2 rounded-[50%] blur-md"
+        style={{
+          bottom: "1%",
+          width: "56%",
+          height: "5%",
+          background: "radial-gradient(closest-side, rgba(0,0,0,0.55), transparent 100%)",
+        }}
+      />
       <img
         src={VARIANT_SRC[variant]}
         alt=""
+        loading="lazy"
+        decoding="async"
         draggable={false}
-        className={cn("w-full h-auto select-none", isMain ? "" : "rounded-2xl")}
-        style={
-          isMain
-            ? {
-                maskImage: "radial-gradient(65% 100% at 50% 62%, #000 62%, transparent 100%)",
-                WebkitMaskImage: "radial-gradient(65% 100% at 50% 62%, #000 62%, transparent 100%)",
-              }
-            : {
-                boxShadow: "0 0 0 1px hsl(var(--border) / 0.4), 0 10px 28px -12px rgba(0,0,0,0.6)",
-              }
-        }
+        className="relative w-full h-auto select-none"
+        style={{ filter: "drop-shadow(0 12px 28px rgba(0,0,0,0.45))" }}
       />
+
 
       {showBadge && (
         <span
