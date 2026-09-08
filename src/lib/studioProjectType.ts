@@ -1,5 +1,4 @@
-import kretoCoverAsset from "@/assets/kreto-cover.jpg.asset.json";
-const kretoCover = kretoCoverAsset.url;
+import kretoCover from "@/assets/kreto-cover.jpg";
 
 export type StudioTypeId = "photo" | "video" | "music" | "design" | "brand" | "writing" | "event" | "project";
 

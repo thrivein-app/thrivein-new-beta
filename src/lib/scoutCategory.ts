@@ -1,5 +1,4 @@
-import kretoCoverAsset from "@/assets/kreto-cover.jpg.asset.json";
-const kretoCover = kretoCoverAsset.url;
+import kretoCover from "@/assets/kreto-cover.jpg";
 // Infers a discipline for a scouted gig from its free text, so every card can
 // show a meaningful HD cover + a human "what kind of work is this" subtitle
 // even when the source page gave us no image at all.
