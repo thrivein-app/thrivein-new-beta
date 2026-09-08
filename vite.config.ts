@@ -173,8 +173,8 @@ export default defineConfig(({ mode }) => {
       // risk that keeps those opt-in. No reason this one should ever go
       // stale on a normal production build.
       sitemapPlugin({
-        projectUrl: env.VITE_SUPABASE_URL,
-        publishableKey: env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        projectUrl: supabaseUrl,
+        publishableKey: supabasePublishableKey,
         siteUrl: "https://www.kretopia.com",
       }),
       // These plugins can emit hundreds/thousands of per-entity HTML files
@@ -182,33 +182,33 @@ export default defineConfig(({ mode }) => {
       // preview uploader can throttle when too many generated files are pushed
       // in one deploy, so keep them opt-in for dedicated SEO export builds.
       generateStaticSocialPages && magazineSharePagesPlugin({
-        projectUrl: env.VITE_SUPABASE_URL,
-        publishableKey: env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        projectUrl: supabaseUrl,
+        publishableKey: supabasePublishableKey,
         siteUrl: "https://www.kretopia.com",
       }),
       generateStaticSocialPages && profileSharePagesPlugin({
-        projectUrl: env.VITE_SUPABASE_URL,
-        publishableKey: env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        projectUrl: supabaseUrl,
+        publishableKey: supabasePublishableKey,
         siteUrl: "https://www.kretopia.com",
       }),
       generateStaticSocialPages && gigSharePagesPlugin({
-        projectUrl: env.VITE_SUPABASE_URL,
-        publishableKey: env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        projectUrl: supabaseUrl,
+        publishableKey: supabasePublishableKey,
         siteUrl: "https://www.kretopia.com",
       }),
       generateStaticSocialPages && eventSharePagesPlugin({
-        projectUrl: env.VITE_SUPABASE_URL,
-        publishableKey: env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        projectUrl: supabaseUrl,
+        publishableKey: supabasePublishableKey,
         siteUrl: "https://www.kretopia.com",
       }),
       generateStaticSocialPages && campaignSharePagesPlugin({
-        projectUrl: env.VITE_SUPABASE_URL,
-        publishableKey: env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        projectUrl: supabaseUrl,
+        publishableKey: supabasePublishableKey,
         siteUrl: "https://www.kretopia.com",
       }),
       generateStaticSocialPages && seoPagesPlugin({
-        projectUrl: env.VITE_SUPABASE_URL,
-        publishableKey: env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        projectUrl: supabaseUrl,
+        publishableKey: supabasePublishableKey,
         siteUrl: "https://www.kretopia.com",
       }),
       // Dev-tool only, opt-in via `ANALYZE=true npm run build` -- writes
