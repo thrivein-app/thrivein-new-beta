@@ -1,12 +1,10 @@
-import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { HoloCard } from "@/components/passport/HoloCard";
 import { BrandLogo } from "@/components/BrandLogo";
-import QRCodeStyling from "qr-code-styling";
+import { KretopiaQRCode } from "@/components/brand/KretopiaQRCode";
 import { Loader2, Ticket, Check, Calendar, MapPin, CalendarPlus, Navigation } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import kMarkAsset from "@/assets/brand/kretopia-k-mark.png.asset.json";
 
 const ENERGY = "#FF2DA1";
 const MIDNIGHT = "#0B0B10";
@@ -46,65 +44,6 @@ export const EventPassCard = ({
   directionsHref,
   className,
 }: EventPassCardProps) => {
-  const qrRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (loading || !token || !qrRef.current) return;
-    let cancelled = false;
-    qrRef.current.innerHTML = "";
-
-    const baseOptions = {
-      width: 240,
-      height: 240,
-      data: token,
-      margin: 8,
-      qrOptions: { errorCorrectionLevel: "H" as const },
-      dotsOptions: {
-        type: "extra-rounded" as const,
-        gradient: {
-          type: "linear" as const,
-          rotation: Math.PI / 4,
-          colorStops: [
-            { offset: 0, color: MIDNIGHT },
-            { offset: 1, color: ENERGY },
-          ],
-        },
-      },
-      cornersSquareOptions: { color: ENERGY, type: "extra-rounded" as const },
-      cornersDotOptions: { color: MIDNIGHT, type: "dot" as const },
-      backgroundOptions: { color: "#ffffff" },
-    };
-
-    const render = (withLogo: boolean) => {
-      if (cancelled || !qrRef.current) return;
-      const qr = new QRCodeStyling(
-        withLogo
-          ? {
-              ...baseOptions,
-              image: kMarkAsset.url,
-              imageOptions: { hideBackgroundDots: true, imageSize: 0.3, margin: 6, crossOrigin: "anonymous" },
-            }
-          : baseOptions,
-      );
-      qr.append(qrRef.current);
-    };
-
-    // Embedding the Kretopia mark in the middle is a branding touch, never
-    // a dependency the pass can fail on -- qr-code-styling renders a blank
-    // canvas (not a graceful fallback) when the center image fails to load,
-    // and a door pass that silently goes blank is worse than one without
-    // the logo. Pre-check the image loads before handing it to the QR
-    // library; fall back to a plain (still gradient/branded) QR otherwise.
-    const probe = new Image();
-    probe.onload = () => render(true);
-    probe.onerror = () => render(false);
-    probe.src = kMarkAsset.url;
-
-    return () => {
-      cancelled = true;
-    };
-  }, [token, loading]);
-
   return (
     <HoloCard className={className}>
       <div className="relative overflow-hidden rounded-2xl border border-border bg-card">
@@ -156,11 +95,7 @@ export const EventPassCard = ({
               </div>
             ) : token ? (
               <>
-                <div
-                  className="rounded-2xl p-3 bg-white"
-                  style={{ boxShadow: `0 0 0 1px ${ENERGY}30, 0 12px 40px -12px ${ENERGY}55` }}
-                  ref={qrRef}
-                />
+                <KretopiaQRCode value={token} ariaLabel={`Entry QR code for ${eventTitle}`} />
                 {checkedIn ? (
                   <div className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-green-600">
                     <Check className="h-4 w-4" /> You're checked in

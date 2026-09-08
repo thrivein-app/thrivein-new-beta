@@ -3,21 +3,20 @@
  * Kretopia's Executive Producer. Use everywhere Kreto appears
  * (landing, FAB, agent drawer, proactive cards, doc-engine headers).
  *
- * Visual: silhouette portrait + animated sunset halo.
- * NOT a robot, NOT a sparkle icon, NOT a chatbot bubble.
+ * Visual: the official Kretopia K mark + activity halo.
  */
 import { motion } from "framer-motion";
-import kretoSrc from "@/assets/kreto-avatar.png";
+import kMarkAsset from "@/assets/brand/kretopia-k-mark.png.asset.json";
 import { cn } from "@/lib/utils";
 
 type Size = "xs" | "sm" | "md" | "lg" | "xl";
 
 const SIZE: Record<Size, { box: string; halo: string; ring: string }> = {
-  xs: { box: "h-7 w-7",   halo: "h-9 w-9",     ring: "inset-[-3px]" },
-  sm: { box: "h-10 w-10", halo: "h-14 w-14",   ring: "inset-[-5px]" },
-  md: { box: "h-16 w-16", halo: "h-24 w-24",   ring: "inset-[-10px]" },
-  lg: { box: "h-32 w-32", halo: "h-48 w-48",   ring: "inset-[-20px]" },
-  xl: { box: "h-64 w-64", halo: "h-[22rem] w-[22rem]", ring: "inset-[-40px]" },
+  xs: { box: "h-7 w-7",   halo: "h-9 w-9",     ring: "inset-[-3px] rounded-lg" },
+  sm: { box: "h-10 w-10", halo: "h-14 w-14",   ring: "inset-[-5px] rounded-xl" },
+  md: { box: "h-16 w-16", halo: "h-24 w-24",   ring: "inset-[-10px] rounded-2xl" },
+  lg: { box: "h-32 w-32", halo: "h-48 w-48",   ring: "inset-[-20px] rounded-2xl" },
+  xl: { box: "h-64 w-64", halo: "h-[22rem] w-[22rem]", ring: "inset-[-40px] rounded-2xl" },
 };
 
 /** "idle" is the default ambient breathing loop. The others each read as a
@@ -104,7 +103,7 @@ export const KretoAvatar = ({
       {thinking && animated ? (
         <motion.span
           aria-hidden
-          className={cn("absolute rounded-full", s.ring)}
+          className={cn("absolute", s.ring)}
           style={{
             background: `conic-gradient(from 0deg, rgba(255,255,255,0) 0%, ${color} 75%, ${color} 100%)`,
             padding: "2px",
@@ -118,7 +117,7 @@ export const KretoAvatar = ({
       ) : (
         <span
           aria-hidden
-          className={cn("absolute rounded-full", s.ring)}
+          className={cn("absolute", s.ring)}
           style={{
             background: color,
             padding: "2px",
@@ -130,14 +129,13 @@ export const KretoAvatar = ({
         />
       )}
 
-      <span className={cn("relative rounded-full overflow-hidden bg-[#0B0B10] ring-1 ring-white/10", s.box)}>
+      <span className={cn("relative flex items-center justify-center", s.box)}>
         <img
-          src={kretoSrc}
-          alt="Kreto, your Executive Producer"
+          src={kMarkAsset.url}
+          alt="Kretopia K"
           width={256}
           height={256}
-          loading="lazy"
-          className="h-full w-full object-cover object-top scale-110"
+          className="h-full w-full select-none object-contain [image-rendering:auto] drop-shadow-[0_8px_18px_hsl(var(--energy)/0.28)]"
           draggable={false}
         />
       </span>

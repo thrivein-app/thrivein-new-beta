@@ -1,14 +1,18 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { QRCodeSVG } from "qrcode.react";
 import { Download, Share2, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { BrandLogo } from "@/components/BrandLogo";
+import { HoloCard } from "@/components/passport/HoloCard";
+import { KretopiaQRCode } from "@/components/brand/KretopiaQRCode";
+import { passportId } from "@/lib/passportId";
 
 interface ProfileQRDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   userId: string;
   userName: string;
+  /** Kept for compatibility; official passes always use the Kretopia mark. */
   userAvatar?: string;
 }
 
@@ -17,7 +21,6 @@ export const ProfileQRDialog = ({
   onOpenChange,
   userId,
   userName,
-  userAvatar,
 }: ProfileQRDialogProps) => {
   const { toast } = useToast();
   const connectUrl = `https://www.kretopia.com/profile/${userId}`;
@@ -39,44 +42,31 @@ export const ProfileQRDialog = ({
   };
 
   const handleDownload = () => {
-    const svg = document.getElementById("profile-qr-code");
-    if (!svg) return;
-
-    const svgData = new XMLSerializer().serializeToString(svg);
+    const qrHost = document.getElementById("profile-qr-code");
+    const qrCanvas = qrHost?.querySelector("canvas");
+    if (!qrCanvas) return;
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
-    const img = new Image();
+    if (!ctx) return;
 
-    img.onload = () => {
-      canvas.width = 1000;
-      canvas.height = 1200;
-      
-      if (ctx) {
-        // White background
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // Draw QR code
-        ctx.drawImage(img, 100, 200, 800, 800);
-        
-        // Add text
-        ctx.fillStyle = "#000000";
-        ctx.font = "bold 48px Arial";
-        ctx.textAlign = "center";
-        ctx.fillText(`Connect with ${userName}`, canvas.width / 2, 100);
-        
-        ctx.font = "32px Arial";
-        ctx.fillText("Scan to connect on Kretopia", canvas.width / 2, 1100);
-      }
+    canvas.width = 1000;
+    canvas.height = 1200;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(qrCanvas, 100, 170, 800, 800);
+    ctx.fillStyle = "#0B0B10";
+    ctx.font = "700 48px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(userName, canvas.width / 2, 92);
+    ctx.font = "500 28px monospace";
+    ctx.fillText(passportId(userId), canvas.width / 2, 1045);
+    ctx.font = "500 28px sans-serif";
+    ctx.fillText("Scan to open this Creative Passport", canvas.width / 2, 1110);
 
-      const pngFile = canvas.toDataURL("image/png");
-      const downloadLink = document.createElement("a");
-      downloadLink.download = `kretopia-${userName.replace(/\s+/g, "-")}.png`;
-      downloadLink.href = pngFile;
-      downloadLink.click();
-    };
-
-    img.src = "data:image/svg+xml;base64," + btoa(svgData);
+    const downloadLink = document.createElement("a");
+    downloadLink.download = `kretopia-${userName.replace(/\s+/g, "-")}.png`;
+    downloadLink.href = canvas.toDataURL("image/png");
+    downloadLink.click();
   };
 
   const handleShare = async () => {
@@ -98,70 +88,58 @@ export const ProfileQRDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle className="text-center">Your Connection QR Code</DialogTitle>
+      <DialogContent className="max-w-sm border-0 bg-transparent p-0 shadow-none">
+        <DialogHeader className="sr-only">
+          <DialogTitle>Your Creative Passport QR code</DialogTitle>
         </DialogHeader>
-        
-        <div className="space-y-6 py-4">
-          {/* QR Code */}
-          <div className="flex flex-col items-center space-y-4">
-            <div className="rounded-2xl border-4 border-border bg-white p-6">
-              <QRCodeSVG
-                id="profile-qr-code"
-                value={connectUrl}
-                size={256}
-                level="H"
-                includeMargin={false}
-                imageSettings={
-                  userAvatar
-                    ? {
-                        src: userAvatar,
-                        x: undefined,
-                        y: undefined,
-                        height: 50,
-                        width: 50,
-                        excavate: true,
-                      }
-                    : undefined
-                }
-              />
-            </div>
-            
-            <div className="text-center space-y-1">
-              <p className="font-semibold">{userName}</p>
-              <p className="text-sm text-muted-foreground">
-                Scan to connect on Kretopia
-              </p>
-            </div>
-          </div>
 
-          {/* Instructions */}
-          <div className="rounded-lg bg-muted/50 p-4 space-y-2">
-            <p className="text-sm font-medium">How it works:</p>
-            <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-              <li>Others scan your QR code with their phone</li>
-              <li>If they have Kretopia: instant connection request</li>
-              <li>New to Kretopia: sign up & auto-connect</li>
-            </ul>
-          </div>
+        <HoloCard maxTilt={4}>
+          <div className="relative overflow-hidden rounded-2xl border border-border bg-card">
+            <div className="relative overflow-hidden bg-background px-5 pb-6 pt-5 text-center">
+              <div aria-hidden className="passport-qr-header-glow pointer-events-none absolute inset-0" />
+              <div className="relative flex flex-col items-center">
+                <BrandLogo size="sm" lockup />
+                <p className="mt-4 text-[10px] font-bold uppercase tracking-[0.18em] text-[hsl(var(--energy))]">
+                  Creative Passport
+                </p>
+                <h2 className="mt-2 text-xl font-bold leading-tight text-foreground">{userName}</h2>
+                <p className="mt-1 font-mono text-[11px] tracking-wide text-muted-foreground">{passportId(userId)}</p>
+              </div>
+            </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-2">
-            <Button onClick={handleDownload} variant="outline" className="flex-1 gap-2">
-              <Download className="h-4 w-4" />
-              Download
-            </Button>
-            <Button onClick={handleShare} variant="outline" className="flex-1 gap-2">
-              <Share2 className="h-4 w-4" />
-              Share
-            </Button>
-            <Button onClick={handleCopyLink} variant="outline" className="flex-1 gap-2">
-              <Copy className="h-4 w-4" />
-              Copy Link
-            </Button>
+            <div className="relative h-3 bg-card">
+              <div className="absolute -left-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-background" />
+              <div className="absolute -right-2 top-1/2 h-4 w-4 -translate-y-1/2 rounded-full bg-background" />
+              <div className="mx-3 mt-1.5 border-t border-dashed border-border" />
+            </div>
+
+            <div className="relative px-5 pb-5 pt-5">
+              <div aria-hidden className="passport-qr-glow pointer-events-none absolute -inset-x-2 top-2 h-64 rounded-[32px] blur-2xl" />
+              <div aria-hidden className="pointer-events-none absolute inset-x-8 top-3 h-px overflow-hidden rounded-full">
+                <div className="holo-card-scan h-full w-1/3" />
+              </div>
+              <div className="relative flex flex-col items-center">
+                <KretopiaQRCode id="profile-qr-code" value={connectUrl} ariaLabel={`QR code for ${userName}'s Creative Passport`} />
+                <p className="mt-3 text-center text-sm text-muted-foreground">Scan to open this Creative Passport</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 px-5 pb-5">
+              <Button onClick={handleDownload} variant="outline" size="sm" className="gap-1.5">
+                <Download className="h-4 w-4" /> Download
+              </Button>
+              <Button onClick={handleShare} variant="outline" size="sm" className="gap-1.5">
+                <Share2 className="h-4 w-4" /> Share
+              </Button>
+              <Button onClick={handleCopyLink} variant="outline" size="sm" className="gap-1.5">
+                <Copy className="h-4 w-4" /> Copy
+              </Button>
+            </div>
+            <p className="pb-5 text-center text-[10px] font-semibold uppercase tracking-[0.28em] text-muted-foreground/50">
+              Kretopia · Where Creativity Lives
+            </p>
           </div>
-        </div>
+        </HoloCard>
       </DialogContent>
     </Dialog>
   );
