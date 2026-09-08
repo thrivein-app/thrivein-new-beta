@@ -541,7 +541,7 @@ export function ScoutedGigsSection({ limit }: ScoutedGigsSectionProps = {}) {
                 {/* Cover letter — collapsed until drafted, keeps the modal short by default */}
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between gap-2">
-                    <h3 className="text-xs font-bold">Cover letter</h3>
+                    <h3 className="text-xs font-bold">Your email</h3>
                     <div className="flex items-center gap-1.5">
                       <Button
                         size="sm"
