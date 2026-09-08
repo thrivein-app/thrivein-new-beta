@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Mic, FileText, ListChecks, Receipt, Sparkles } from "lucide-react";
 import { CtaButton } from "@/components/ui/cta-button";
-import { Button } from "@/components/ui/button";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
 
 interface StudioCreateHeroProps {
