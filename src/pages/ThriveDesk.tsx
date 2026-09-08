@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { CreativeLoader } from "@/components/ui/creative-loader";
 import { useParams, useSearchParams } from "react-router-dom";
-import { Loader2, Menu, X, PanelRightOpen, PanelLeftClose, PanelLeftOpen, FolderKanban } from "lucide-react";
+import { FolderKanban } from "lucide-react";
 import { ProjectSettingsMenu } from "@/components/project/ProjectSettingsMenu";
 import { SimpleProjectHeader } from "@/components/project/SimpleProjectHeader";
 import { DeskShell } from "@/components/project/desk/DeskShell";
@@ -18,20 +17,17 @@ import { StudioCreatedAcknowledgement } from "@/components/project/studio/Studio
 import { DeskTabContent } from "@/components/project/DeskTabContent";
 import { useAgentRole } from "@/hooks/useAgentRole";
 
-import { MobileProjectHub } from "@/components/project/mobile/MobileProjectHub";
 import { StudioRoom } from "@/components/project/studio/StudioRoom";
 import { StudioPhaseRail } from "@/components/project/studio/StudioPhaseRail";
 import { ProjectCompleteDialog } from "@/components/project/studio/ProjectCompleteDialog";
 import { DeskCommandPalette } from "@/components/desk/DeskCommandPalette";
 import { VoiceCommandSheet } from "@/components/desk/VoiceCommandSheet";
-import { ArrowLeft } from "lucide-react";
 import { useProjectData } from "@/hooks/useProjectData";
 import { useProjectFlow, PROJECT_FLOW_STAGES, STUDIO_PHASES, stageToPhase, type ProjectFlowStageId } from "@/hooks/useProjectFlow";
 import { useProjectFlowExtras } from "@/hooks/useProjectFlowExtras";
 import { notifyPhaseAdvanced } from "@/lib/notifyPhaseAdvanced";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 const ThriveDesk = () => {
   const { projectId } = useParams();
