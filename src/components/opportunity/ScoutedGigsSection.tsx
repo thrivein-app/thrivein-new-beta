@@ -564,18 +564,28 @@ export function ScoutedGigsSection({ limit }: ScoutedGigsSectionProps = {}) {
                         <Sparkles className="h-3 w-3 mr-1" />
                         Open in Kreto
                       </Button>
-                      {!coverLetter && (
-                        <Button size="sm" variant="outline" className="h-7 text-xs px-2" onClick={draftLetter} disabled={drafting}>
-                          {drafting ? <KretoMark size="xs" state="active" className="mr-1" /> : <Sparkles className="h-3 w-3 mr-1" />}
-                          Draft
-                        </Button>
-                      )}
+                      <Button size="sm" variant="outline" className="h-7 text-xs px-2" onClick={() => draftLetter()} disabled={drafting}>
+                        {drafting ? <KretoMark size="xs" state="active" className="mr-1" /> : <Sparkles className="h-3 w-3 mr-1" />}
+                        {coverLetter ? "Rewrite" : "Draft"}
+                      </Button>
                     </div>
                   </div>
                   {drafting ? (
                     <div className="space-y-1.5"><Skeleton className="h-3.5 w-full" /><Skeleton className="h-3.5 w-3/4" /></div>
                   ) : coverLetter ? (
-                    <Textarea value={coverLetter} onChange={(e) => setCoverLetter(e.target.value)} rows={5} className="text-sm" />
+                    <div className="space-y-1.5">
+                      <Input
+                        value={subject}
+                        onChange={(e) => setSubject(e.target.value)}
+                        placeholder="Subject"
+                        className="h-8 text-sm"
+                        aria-label="Email subject"
+                      />
+                      <Textarea value={coverLetter} onChange={(e) => setCoverLetter(e.target.value)} rows={8} className="text-sm" />
+                      <p className="text-[10px] text-muted-foreground">
+                        Written for you and this gig — edit anything before sending.
+                      </p>
+                    </div>
                   ) : null}
                 </div>
               </div>
@@ -584,10 +594,8 @@ export function ScoutedGigsSection({ limit }: ScoutedGigsSectionProps = {}) {
               <div className="p-4 pt-0 space-y-2">
                 <div className="grid grid-cols-2 gap-2">
                   {openGig.contact_email ? (
-                    <Button asChild size="sm" variant="default" onClick={trackApplyClick}>
-                      <a href={`mailto:${openGig.contact_email}?subject=${encodeURIComponent(`RE: ${openGig.title}`)}&body=${encodeURIComponent(coverLetter)}`}>
-                        <Mail className="h-3.5 w-3.5 mr-1.5" />Email apply
-                      </a>
+                    <Button size="sm" variant="default" onClick={emailApply} disabled={drafting}>
+                      <Mail className="h-3.5 w-3.5 mr-1.5" />Email apply
                     </Button>
                   ) : (
                     <Button asChild size="sm" variant="default" onClick={trackApplyClick}>
