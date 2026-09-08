@@ -132,7 +132,6 @@ export const KretoCharacter = ({
   hoverable = false,
 }: KretoCharacterProps) => {
   const reducedMotion = useReducedMotion();
-  const isMain = variant === "main";
   const showBadge = state !== "idle" && state !== "attentive";
   // Real state, not a fake gesture: only set while the pointer is actually
   // over this element (onHoverStart/End below), cleared the moment it

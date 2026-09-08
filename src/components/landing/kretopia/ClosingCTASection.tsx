@@ -95,7 +95,7 @@ export const ClosingCTASection = () => {
           <h2 id="closing-cta-title" className="landing-h1 landing-glow">
             {creatorCount ? `Join ${creatorCount}+ creatives` : "Join the creatives"}
             <br />
-            <span className="italic pink-glow-breathe" style={{ color: ACCENT }}>already proving their work.</span>
+            <span className="landing-accent">already proving their work.</span>
           </h2>
         }
         keyValue={
