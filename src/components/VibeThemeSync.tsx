@@ -37,8 +37,16 @@ export function VibeThemeSync() {
   const { setTheme } = useTheme();
 
   useEffect(() => {
-    // V1: Midnight locked. Ignore stored/profile vibe until picker returns post-launch.
-    applyVibe("midnight", setTheme);
+    // Two modes only: Dark (midnight) and Light (daylight). Neon is retired —
+    // anyone still stored on it falls back to Dark.
+    const stored = getStoredVibe();
+    applyVibe(stored === "daylight" ? "daylight" : "midnight", setTheme);
+    const onChange = (e: Event) => {
+      const v = (e as CustomEvent).detail;
+      if (v === "daylight" || v === "midnight") setTheme(v === "daylight" ? "light" : "dark");
+    };
+    window.addEventListener("ui-vibe:change", onChange);
+    return () => window.removeEventListener("ui-vibe:change", onChange);
   }, [setTheme]);
 
   return null;
