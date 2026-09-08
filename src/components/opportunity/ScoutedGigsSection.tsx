@@ -144,7 +144,10 @@ export function ScoutedGigsSection({ limit }: ScoutedGigsSectionProps = {}) {
   const [prefsOpen, setPrefsOpen] = useState(false);
   const [enriching, setEnriching] = useState(false);
   const [coverLetter, setCoverLetter] = useState("");
+  const [subject, setSubject] = useState("");
   const [drafting, setDrafting] = useState(false);
+  // Keeps a written email per gig so reopening a card is instant and free.
+  const draftCache = useRef<Record<string, { subject: string; body: string }>>({});
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const reducedMotion = useReducedMotion();
 
