@@ -297,30 +297,23 @@ export const SimpleProjectHeader = ({ project, collaborators, onCollaboratorsCha
     return (
       <>
         <div className="flex items-center gap-2 flex-1 min-w-0">
-          <div className="flex-1 min-w-0">
-            {/* Persistent topbar chrome, not the page's content heading —
-                StudioRoom's VibeHeader renders the real <h1> for this
-                project inside the "today" tab, so this compact repeat
-                sits one level below it instead of duplicating it. */}
-            <h2 className="text-sm sm:text-base font-semibold leading-tight line-clamp-2 break-words">
-              {project.title}
-            </h2>
-            {/* Status dot only on mobile (saves room for the title) */}
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <span
-                className={cn(
-                  "h-1.5 w-1.5 rounded-full shrink-0",
-                  project.status === "completed" && "bg-primary",
-                  project.status === "planning" && "bg-yellow-500",
-                  (!project.status || project.status === "active") && "bg-green-500",
-                )}
-              />
-              <span className="text-[10px] text-muted-foreground capitalize truncate">
-                {project.status || "active"}
-              </span>
-            </div>
+          {/* The project name now lives in the topbar switcher, so this
+              block only carries the status — no duplicate heading. */}
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span
+              className={cn(
+                "h-1.5 w-1.5 rounded-full shrink-0",
+                project.status === "completed" && "bg-primary",
+                project.status === "planning" && "bg-yellow-500",
+                (!project.status || project.status === "active") && "bg-green-500",
+              )}
+            />
+            <span className="text-[11px] text-muted-foreground capitalize truncate">
+              {project.status || "active"}
+            </span>
           </div>
         </div>
+
         <div className="flex items-center gap-2 shrink-0">
           <div className="flex -space-x-1.5">
             {collaborators.slice(0, 3).map((collab) => (
