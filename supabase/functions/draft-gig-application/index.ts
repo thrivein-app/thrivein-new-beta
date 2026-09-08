@@ -30,7 +30,7 @@ serve(async (req) => {
     const { scouted_gig_id } = await req.json();
     const [{ data: gig }, { data: profile }] = await Promise.all([
       supabase.from("scouted_gigs")
-        .select("title, company, description, compensation, location, skills, fit_reason")
+        .select("title, company, description, full_description, compensation, location, skills, fit_reason, contact_email, source_name, source_url")
         .eq("id", scouted_gig_id).eq("target_user_id", user.id).maybeSingle(),
       supabase.from("profiles")
         .select("full_name, role, sub_roles, professional_skills, passion_skills, bio, location, username")
@@ -44,27 +44,45 @@ serve(async (req) => {
 
     const epkUrl = `https://www.kretopia.com/${profile.username || user.id}`;
 
+    const signature = [
+      profile.full_name,
+      [profile.role, profile.location].filter(Boolean).join(" · "),
+      epkUrl,
+      user.email || "",
+    ].filter(Boolean).join("\n");
+
     const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${aiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
         messages: [
-          { role: "system", content: "You write short, warm, confident cover letters for creatives. 120-180 words. No fluff. End with the EPK link. First-person, no emojis, no clichés." },
+          {
+            role: "system",
+            content:
+              "You write ready-to-send application emails for creatives. Return ONLY JSON: {\"subject\": string, \"body\": string}. " +
+              "Subject: specific, under 70 chars, references the exact role (and company when known). " +
+              "Body: a complete email — greeting, 120-180 words in first person referencing concrete details of THIS gig and the creator's real skills/credits, a clear close, then the signature block given to you verbatim on its own lines. " +
+              "No placeholders like [Name], no markdown, no emojis, no clichés.",
+          },
           { role: "user", content: `GIG: ${gig.title} at ${gig.company || "the company"}.
-DESCRIPTION: ${gig.description || ""}
+DESCRIPTION: ${(gig.full_description || gig.description || "").slice(0, 4000)}
 COMP: ${gig.compensation || "n/a"}
 LOCATION: ${gig.location || "n/a"}
+SOURCE: ${gig.source_name || gig.source_url || "n/a"}
 WHY THEY MATCH: ${gig.fit_reason || ""}
 
 CREATOR: ${profile.full_name}, ${profile.role}${profile.sub_roles?.length ? ` (${profile.sub_roles.join(", ")})` : ""}
 SKILLS: ${[...(profile.professional_skills || []), ...(profile.passion_skills || [])].join(", ")}
 BASED IN: ${profile.location || ""}
 BIO: ${profile.bio || ""}
-EPK: ${epkUrl}
 
-Draft the letter now.` },
+SIGNATURE BLOCK (use verbatim at the end):
+${signature}
+
+Write the email now as JSON.` },
         ],
+        response_format: { type: "json_object" },
       }),
     });
     if (!r.ok) {
@@ -73,11 +91,33 @@ Draft the letter now.` },
       throw new Error("AI failed");
     }
     const j = await r.json();
-    const cover_letter = j.choices?.[0]?.message?.content || "";
+    const raw = j.choices?.[0]?.message?.content || "";
 
-    return new Response(JSON.stringify({ cover_letter, epk_url: epkUrl }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    let subject = "";
+    let body = "";
+    try {
+      const parsed = JSON.parse(raw.replace(/^```json\s*|\s*```$/g, "").trim());
+      subject = typeof parsed.subject === "string" ? parsed.subject : "";
+      body = typeof parsed.body === "string" ? parsed.body : "";
+    } catch {
+      body = raw;
+    }
+    if (!subject) {
+      subject = `${profile.full_name || "Application"} — ${gig.title}${gig.company ? ` @ ${gig.company}` : ""}`;
+    }
+    if (body && !body.includes(epkUrl)) body = `${body.trim()}\n\n${signature}`;
+
+    return new Response(
+      JSON.stringify({
+        subject,
+        body,
+        // Back-compat: the UI still calls the editable draft a "cover letter".
+        cover_letter: body,
+        to: gig.contact_email || null,
+        epk_url: epkUrl,
+      }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
   } catch (e) {
     console.error(e);
     return new Response(JSON.stringify({ error: String(e) }), {

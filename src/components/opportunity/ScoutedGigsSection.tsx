@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { FirstTimeHint } from "@/components/ui/first-time-hint";
 import {
   Globe, Linkedin, Instagram, Sparkles, MapPin, ExternalLink,
@@ -144,7 +145,10 @@ export function ScoutedGigsSection({ limit }: ScoutedGigsSectionProps = {}) {
   const [prefsOpen, setPrefsOpen] = useState(false);
   const [enriching, setEnriching] = useState(false);
   const [coverLetter, setCoverLetter] = useState("");
+  const [subject, setSubject] = useState("");
   const [drafting, setDrafting] = useState(false);
+  // Keeps a written email per gig so reopening a card is instant and free.
+  const draftCache = useRef<Record<string, { subject: string; body: string }>>({});
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const reducedMotion = useReducedMotion();
 
@@ -220,7 +224,9 @@ export function ScoutedGigsSection({ limit }: ScoutedGigsSectionProps = {}) {
   const openDetail = async (gig: ScoutedGig) => {
     if (!user) return;
     setOpenGig(gig);
-    setCoverLetter("");
+    const cached = draftCache.current[gig.id];
+    setCoverLetter(cached?.body || "");
+    setSubject(cached?.subject || "");
     await supabase.from("scouted_gig_actions").upsert({
       user_id: user.id, scouted_gig_id: gig.id, action: "opened",
     }).then(() => {}, () => {});
@@ -239,23 +245,50 @@ export function ScoutedGigsSection({ limit }: ScoutedGigsSectionProps = {}) {
         );
       }
     }
+
+    // The email should already be written by the time they reach the buttons,
+    // personalised to their Passport and to this exact gig.
+    if (!cached) draftLetter(gig.id);
   };
 
-  const draftLetter = async () => {
-    if (!openGig || !user) return;
+  const draftLetter = async (gigId?: string) => {
+    const id = gigId || openGig?.id;
+    if (!id || !user) return null;
     setDrafting(true);
     const { data, error } = await supabase.functions.invoke("draft-gig-application", {
-      body: { scouted_gig_id: openGig.id },
+      body: { scouted_gig_id: id },
     });
     setDrafting(false);
-    if (error || !data?.cover_letter) {
-      toast({ title: "Couldn't draft letter", variant: "destructive" });
-      return;
+    const body = data?.body || data?.cover_letter;
+    if (error || !body) {
+      toast({ title: "Couldn't draft the email", variant: "destructive" });
+      return null;
     }
-    setCoverLetter(data.cover_letter);
+    const draft = { subject: data?.subject || "", body: body as string };
+    draftCache.current[id] = draft;
+    setCoverLetter(draft.body);
+    setSubject(draft.subject);
     supabase.from("scouted_gig_actions").upsert({
-      user_id: user.id, scouted_gig_id: openGig.id, action: "drafted",
+      user_id: user.id, scouted_gig_id: id, action: "drafted",
     }).then(() => {}, () => {});
+    return draft;
+  };
+
+  // Opens the mail client with the personalised email already filled in,
+  // drafting first if the background draft hasn't landed yet.
+  const emailApply = async () => {
+    if (!openGig?.contact_email) return;
+    trackApplyClick();
+    let body = coverLetter;
+    let subj = subject;
+    if (!body) {
+      const draft = await draftLetter(openGig.id);
+      body = draft?.body || "";
+      subj = draft?.subject || "";
+    }
+    const finalSubject = subj || `Application — ${openGig.title}${openGig.company ? ` @ ${openGig.company}` : ""}`;
+    window.location.href =
+      `mailto:${openGig.contact_email}?subject=${encodeURIComponent(finalSubject)}&body=${encodeURIComponent(body)}`;
   };
 
   const trackApplyClick = () => {
@@ -509,7 +542,7 @@ export function ScoutedGigsSection({ limit }: ScoutedGigsSectionProps = {}) {
                 {/* Cover letter — collapsed until drafted, keeps the modal short by default */}
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between gap-2">
-                    <h3 className="text-xs font-bold">Cover letter</h3>
+                    <h3 className="text-xs font-bold">Your email</h3>
                     <div className="flex items-center gap-1.5">
                       <Button
                         size="sm"
@@ -532,18 +565,28 @@ export function ScoutedGigsSection({ limit }: ScoutedGigsSectionProps = {}) {
                         <Sparkles className="h-3 w-3 mr-1" />
                         Open in Kreto
                       </Button>
-                      {!coverLetter && (
-                        <Button size="sm" variant="outline" className="h-7 text-xs px-2" onClick={draftLetter} disabled={drafting}>
-                          {drafting ? <KretoMark size="xs" state="active" className="mr-1" /> : <Sparkles className="h-3 w-3 mr-1" />}
-                          Draft
-                        </Button>
-                      )}
+                      <Button size="sm" variant="outline" className="h-7 text-xs px-2" onClick={() => draftLetter()} disabled={drafting}>
+                        {drafting ? <KretoMark size="xs" state="active" className="mr-1" /> : <Sparkles className="h-3 w-3 mr-1" />}
+                        {coverLetter ? "Rewrite" : "Draft"}
+                      </Button>
                     </div>
                   </div>
                   {drafting ? (
                     <div className="space-y-1.5"><Skeleton className="h-3.5 w-full" /><Skeleton className="h-3.5 w-3/4" /></div>
                   ) : coverLetter ? (
-                    <Textarea value={coverLetter} onChange={(e) => setCoverLetter(e.target.value)} rows={5} className="text-sm" />
+                    <div className="space-y-1.5">
+                      <Input
+                        value={subject}
+                        onChange={(e) => setSubject(e.target.value)}
+                        placeholder="Subject"
+                        className="h-8 text-sm"
+                        aria-label="Email subject"
+                      />
+                      <Textarea value={coverLetter} onChange={(e) => setCoverLetter(e.target.value)} rows={8} className="text-sm" />
+                      <p className="text-[10px] text-muted-foreground">
+                        Written for you and this gig — edit anything before sending.
+                      </p>
+                    </div>
                   ) : null}
                 </div>
               </div>
@@ -552,10 +595,8 @@ export function ScoutedGigsSection({ limit }: ScoutedGigsSectionProps = {}) {
               <div className="p-4 pt-0 space-y-2">
                 <div className="grid grid-cols-2 gap-2">
                   {openGig.contact_email ? (
-                    <Button asChild size="sm" variant="default" onClick={trackApplyClick}>
-                      <a href={`mailto:${openGig.contact_email}?subject=${encodeURIComponent(`RE: ${openGig.title}`)}&body=${encodeURIComponent(coverLetter)}`}>
-                        <Mail className="h-3.5 w-3.5 mr-1.5" />Email apply
-                      </a>
+                    <Button size="sm" variant="default" onClick={emailApply} disabled={drafting}>
+                      <Mail className="h-3.5 w-3.5 mr-1.5" />Email apply
                     </Button>
                   ) : (
                     <Button asChild size="sm" variant="default" onClick={trackApplyClick}>
