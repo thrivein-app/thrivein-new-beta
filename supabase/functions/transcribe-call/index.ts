@@ -325,6 +325,21 @@ serve(async (req) => {
       if (aiErr) console.warn("[transcribe-call] action items insert failed", aiErr);
     }
 
+    // 5b. Suggested Studios become reviewable action items too, so the host
+    //     can spin one up from the recap with a single tap.
+    if (parsed.suggested_projects?.length) {
+      const studioRows = parsed.suggested_projects.slice(0, 3).map((p) => ({
+        transcript_id,
+        kind: "studio",
+        title: p.name.slice(0, 500),
+        detail: [p.description, p.suggested_members?.length ? `With: ${p.suggested_members.join(", ")}` : null]
+          .filter(Boolean)
+          .join("\n\n"),
+      }));
+      const { error: spErr } = await admin.from("call_action_items").insert(studioRows);
+      if (spErr) console.warn("[transcribe-call] studio suggestions insert failed", spErr);
+    }
+
     // 6. Embed into Thrive Brain (best-effort) for retrieval by the Copilot.
     const { data: tFull } = await admin
       .from("call_transcripts")
