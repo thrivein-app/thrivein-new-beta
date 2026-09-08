@@ -221,6 +221,7 @@ export function ScoutedGigsSection({ limit }: ScoutedGigsSectionProps = {}) {
     if (!user) return;
     setOpenGig(gig);
     setCoverLetter("");
+    setSubject("");
     await supabase.from("scouted_gig_actions").upsert({
       user_id: user.id, scouted_gig_id: gig.id, action: "opened",
     }).then(() => {}, () => {});
