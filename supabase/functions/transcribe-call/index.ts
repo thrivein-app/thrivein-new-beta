@@ -187,7 +187,6 @@ serve(async (req) => {
                       additionalProperties: false,
                     },
                   },
-                },
                   decisions: {
                     type: "array",
                     description: "Clear decisions made on the call, in the words used. Empty if nothing was actually decided — never invent one.",
