@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Bookmark, MapPin, Sparkles, X } from "lucide-react";
-import type { ComponentType, MouseEvent, ReactNode } from "react";
+import { useEffect, useState, type ComponentType, type MouseEvent, type ReactNode } from "react";
 
 export interface ScoutedCardProps {
   /** Gig title — the loudest thing on the card. */
@@ -13,6 +13,8 @@ export interface ScoutedCardProps {
   imageUrl: string;
   /** Descriptive alt text. */
   imageAlt: string;
+  /** Themed HD cover used if `imageUrl` fails to load. */
+  fallbackImageUrl?: string;
   /** Small key facts rendered as discreet badges (3-5 max). */
   tags?: string[];
   /** Fit percentage badge, 0-100. */
@@ -47,6 +49,7 @@ export function ScoutedCard({
   subtitle,
   imageUrl,
   imageAlt,
+  fallbackImageUrl,
   tags = [],
   fitScore,
   fitReason,
@@ -64,6 +67,10 @@ export function ScoutedCard({
   className,
 }: ScoutedCardProps) {
   const feature = variant === "feature";
+  // Scraped source images 404 often — swap to the themed HD cover rather than
+  // leaving a blank hole in the card.
+  const [src, setSrc] = useState(imageUrl);
+  useEffect(() => setSrc(imageUrl), [imageUrl]);
 
   const cover = (
     <div
@@ -73,12 +80,15 @@ export function ScoutedCard({
       )}
     >
       <img
-        src={imageUrl}
+        src={src}
         alt={imageAlt}
         width={1280}
         height={720}
         loading={priorityImage ? "eager" : "lazy"}
         decoding="async"
+        onError={() => {
+          if (fallbackImageUrl && src !== fallbackImageUrl) setSrc(fallbackImageUrl);
+        }}
         className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
       />
       {/* Legibility scrim — keeps the badges readable on any photo. */}
