@@ -1043,10 +1043,6 @@ body:has(> [data-state="open"][role="dialog"]) .snap-receipt-fab {
   0%, 100% { opacity: 0.38; transform: scale(0.985); }
   50% { opacity: 0.72; transform: scale(1.015); }
 }
-@keyframes holo-card-edge-travel {
-  from { transform: translate3d(-70%, -20%, 0) rotate(12deg); }
-  to { transform: translate3d(120%, 20%, 0) rotate(12deg); }
-}
 .holo-card-aura {
   background: radial-gradient(70% 70% at 20% 10%, hsl(var(--energy) / 0.42), transparent 70%);
   animation: holo-card-aura 5s ease-in-out infinite;
@@ -1056,10 +1052,6 @@ body:has(> [data-state="open"][role="dialog"]) .snap-receipt-fab {
     0 28px 70px -34px hsl(var(--foreground) / 0.55),
     0 12px 32px -24px hsl(var(--energy) / 0.5),
     inset 0 1px 0 hsl(var(--foreground) / 0.12);
-}
-.holo-card-scan {
-  background: linear-gradient(90deg, transparent, hsl(var(--energy) / 0.95), transparent);
-  animation: ai-scan-sweep 3.8s ease-in-out infinite;
 }
 .holo-card-grid {
   background-image:
@@ -1074,20 +1066,6 @@ body:has(> [data-state="open"][role="dialog"]) .snap-receipt-fab {
   box-shadow: inset 0 0 0 1px hsl(var(--energy) / 0.08);
   overflow: hidden;
 }
-.holo-card-edge::after {
-  content: "";
-  position: absolute;
-  inset: -60% auto -60% 0;
-  width: 42%;
-  background: linear-gradient(90deg, transparent, hsl(var(--foreground) / 0.32), hsl(var(--energy) / 0.5), transparent);
-  filter: blur(6px);
-  opacity: 0;
-  transition: opacity 300ms ease;
-}
-.group\/holo:hover .holo-card-edge::after {
-  opacity: 1;
-  animation: holo-card-edge-travel 1.4s ease-out both;
-}
 .passport-qr-header-glow {
   background: radial-gradient(70% 60% at 50% 0%, hsl(var(--energy) / 0.15), transparent 65%);
 }
@@ -1096,8 +1074,6 @@ body:has(> [data-state="open"][role="dialog"]) .snap-receipt-fab {
 }
 @media (prefers-reduced-motion: reduce) {
   .holo-card-aura { animation: none; opacity: 0.5; }
-  .holo-card-scan { display: none; }
-  .group\/holo:hover .holo-card-edge::after { animation: none; opacity: 0; }
 }
 
 /* ============================================================

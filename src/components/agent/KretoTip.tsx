@@ -11,7 +11,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { ArrowRight, X } from "lucide-react";
-import { KretoMark } from "@/components/brand/KretoMark";
 import { KretoPresence } from "@/components/brand/KretoPresence";
 import { cn } from "@/lib/utils";
 
@@ -110,8 +109,6 @@ const DISMISS_HOURS = 6;
  *  other group here. Studio shipped in the pilot; Scout, Passport, Events
  *  and Circle (the brief's "Stage/Circle context" -- covers both /circle
  *  and /stages) are the rollout surfaces approved so far. */
-const PRESENCE_EYEBROWS = new Set(["Studio", "Scout", "Passport", "Events", "Circle"]);
-
 interface KretoTipProps {
   /** Override route detection with an explicit tip group. */
   surface?: "today" | "discover" | "desk" | "match" | "pay" | "passport";
@@ -159,8 +156,6 @@ export const KretoTip = ({ surface, className, compact }: KretoTipProps) => {
   // ROUTE_TIPS above), not a real generated proposal, so every instance
   // renders state="idle" regardless of surface -- proposal_ready would be a
   // false claim about work Kreto hasn't actually done.
-  const usesPresence = PRESENCE_EYEBROWS.has(tip.eyebrow);
-
   const openKreto = (prompt?: string) => {
     window.dispatchEvent(new CustomEvent("thrive-copilot:open", { detail: prompt ? { prompt } : {} }));
   };
@@ -195,11 +190,7 @@ export const KretoTip = ({ surface, className, compact }: KretoTipProps) => {
       </button>
 
       <div className="relative flex items-start gap-3 sm:gap-4">
-        {usesPresence ? (
-          <KretoPresence size={compact ? "compact" : "card"} state="idle" />
-        ) : (
-          <KretoMark variant="default" size={compact ? "sm" : "md"} />
-        )}
+        <KretoPresence size={compact ? "compact" : "card"} state="idle" />
 
         <div className="min-w-0 flex-1 pr-6">
           <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[hsl(var(--energy))] mb-1">

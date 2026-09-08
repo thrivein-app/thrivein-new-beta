@@ -1,25 +1,8 @@
 /**
- * KretoPresence — Kreto's embodied visual presence. Global rollout component
- * per KRETO_GLOBAL_PRESENCE_SYSTEM.md, built on the Phase A pilot
- * (KRETO_3D_REFERENCE_AND_RIGHTS_AUDIT.md).
- *
- * Original design, not a reproduction of any external reference. Built
- * entirely from the character rules in Kretopia_Kreto_Evolution_Brief_v1.docx
- * ("Character rules to lock"), deliberately correcting away from the
- * attached "Blinky-style" reference image (which the brief itself flags as
- * unrefined, not a cleared final asset):
- *   - graphite / near-black body material (not the reference's white shell);
- *   - one warm off-white panel accent, not a mostly-white body;
- *   - the real Kretopia K-mark (via KretoMark, never redrawn/approximated);
- *   - one signal-dot cue on the visor (inspired by the wordmark's own accent
- *     dot) instead of the reference's paired crescent eyes -- a deliberately
- *     different, more original identifying feature;
- *   - the Kretopia pink used only as a small, controlled accent on that one
- *     dot, never as a body wash or constant glow.
- *
- * Pure layered SVG + CSS/Framer Motion transforms (opacity/scale/translate
- * only) -- no WebGL, no three.js, no new dependency. Framer Motion is
- * already used throughout Landing and this repo generally.
+ * KretoPresence — Kreto's lightweight, embodied visual presence.
+ * Uses an optimized 16 KB render of the same owned character shown on the
+ * Landing page, instead of the former abstract circle. Motion is limited to
+ * compositor-friendly transforms and respects reduced-motion preferences.
  *
  * State is entirely caller-driven and never invented here: this component
  * has no internal timers or fake progress (KRETO_STATE_MACHINE_REPORT.md).
@@ -32,8 +15,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
-import { KretoMark } from "@/components/brand/KretoMark";
 import { cn } from "@/lib/utils";
+import kretoMini from "@/assets/brand/kreto/kreto-mini.webp";
 
 export type KretoPresenceState =
   | "idle"
@@ -142,9 +125,6 @@ export const KretoPresence = ({
   const reducedMotion = useReducedMotion();
   const [hovered, setHovered] = useState(false);
   const px = SIZE_PX[size];
-  // "micro" (24px) is too small for any legible badge; everything else gets
-  // one, sized so its footprint stays proportionate at each presence size.
-  const showMark = size !== "micro";
   const isInteractive = !!onClick;
 
   // "attentive" is real DOM hover/focus on this control, never a caller
@@ -199,51 +179,23 @@ export const KretoPresence = ({
       animate={bodyAnimate}
       transition={bodyTransition}
     >
-      <svg viewBox="0 0 100 100" width={px} height={px} aria-hidden="true" focusable="false">
-        <defs>
-          <linearGradient id="kreto-presence-plate" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="hsl(var(--secondary))" />
-            <stop offset="100%" stopColor="hsl(var(--k-midnight))" />
-          </linearGradient>
-          <radialGradient id="kreto-presence-signal" cx="35%" cy="35%" r="70%">
-            <stop offset="0%" stopColor={signalColor(effectiveState)} stopOpacity="1" />
-            <stop offset="100%" stopColor={signalColor(effectiveState)} stopOpacity="0.45" />
-          </radialGradient>
-        </defs>
-
-        {/* Graphite / near-black plate -- the body material the brief's own
-            "Character rules to lock" calls for, replacing the reference's
-            white shell. */}
-        <rect x="9" y="7" width="82" height="86" rx="26" fill="url(#kreto-presence-plate)" />
-        <rect x="9" y="7" width="82" height="86" rx="26" fill="none" stroke="hsl(var(--border))" strokeWidth="1" opacity="0.4" />
-
-        {/* One warm off-white panel accent -- selective, not a body wash. */}
-        <path
-          d="M 68 68 Q 86 70 84 88 Q 70 92 60 84 Q 62 72 68 68 Z"
-          fill="rgba(255,255,255,0.07)"
-        />
-
-        {/* The one signal-dot cue, inspired by the wordmark's accent dot --
-            deliberately singular, not the reference's paired crescent eyes. */}
-        <motion.circle
-          cx="50"
-          cy="42"
-          r="9"
-          fill="url(#kreto-presence-signal)"
+      <img
+        src={kretoMini}
+        alt=""
+        width={256}
+        height={317}
+        decoding="async"
+        draggable={false}
+        className="absolute bottom-0 left-1/2 h-auto max-h-full w-auto max-w-full -translate-x-1/2 select-none object-contain drop-shadow-lg"
+      />
+      {effectiveState !== "idle" && effectiveState !== "attentive" && (
+        <motion.span
+          aria-hidden
+          className="absolute right-0 top-0 h-[18%] min-h-1.5 w-[18%] min-w-1.5 rounded-full ring-2 ring-background"
+          style={{ backgroundColor: signalColor(effectiveState) }}
           animate={signalAnimate}
           transition={signalTransition}
         />
-        <circle cx="50" cy="42" r="9" fill="none" stroke={signalColor(effectiveState)} strokeOpacity="0.5" strokeWidth="1" />
-      </svg>
-
-      {showMark && (
-        <div className="absolute bottom-[14%] left-1/2 -translate-x-1/2 opacity-90">
-          <KretoMark
-            variant="bare"
-            size={size === "hero" || size === "full" ? "sm" : "xs"}
-            className={size === "compact" ? "scale-75" : undefined}
-          />
-        </div>
       )}
     </motion.div>
   );

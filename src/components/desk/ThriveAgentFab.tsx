@@ -14,7 +14,7 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { KretoMark } from "@/components/brand/KretoMark";
+import { KretoPresence } from "@/components/brand/KretoPresence";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -764,7 +764,7 @@ export const ThriveAgentFab = () => {
     <div className={cn("relative pl-5 pt-5 pb-3 border-b border-border shrink-0", showClose ? "pr-16" : "pr-5")}>
       <div className="flex items-center justify-between gap-3">
         <h2 className="flex items-center gap-2 text-base font-semibold text-foreground">
-          <Sparkles className="h-4 w-4 text-primary" />
+          <KretoPresence size="compact" state="idle" />
           Kreto
         </h2>
         <div className="flex items-center gap-2">
@@ -970,19 +970,19 @@ export const ThriveAgentFab = () => {
 
             {sending && messages[messages.length - 1]?.role === "user" && (
               <div className="mr-auto bg-accent/60 rounded-2xl px-3.5 py-2.5 text-sm text-muted-foreground inline-flex items-center gap-2">
-                <KretoMark size="xs" state="active" />
+                <KretoPresence size="micro" state="processing" />
                 Thinking…
               </div>
             )}
             {voiceBusy && (
               <div className="mr-auto bg-primary/10 border border-primary/30 rounded-2xl px-3.5 py-2.5 text-sm text-foreground inline-flex items-center gap-2">
-                <KretoMark size="xs" state="pending" />
+                <KretoPresence size="micro" state="listening" />
                 Hearing you out…
               </div>
             )}
             {speaking && !voiceMuted && (
               <div className="mr-auto bg-accent/60 rounded-2xl px-3.5 py-2.5 text-xs text-muted-foreground inline-flex items-center gap-2">
-                <KretoMark size="xs" state="active" />
+                <KretoPresence size="micro" state="attentive" />
                 Kreto is speaking…
                 <button
                   className="ml-1 underline text-primary"
@@ -999,7 +999,7 @@ export const ThriveAgentFab = () => {
           <div className="border-t border-border bg-background p-3 pb-[calc(env(safe-area-inset-bottom)+0.75rem)] shrink-0">
             {recording ? (
               <div className="flex items-center gap-2 rounded-2xl border border-destructive/40 bg-destructive/10 px-3 py-2.5">
-                <KretoMark size="xs" state="recording" className="shrink-0" />
+                <KretoPresence size="compact" state="listening" className="shrink-0" />
                 <div className="flex-1 text-sm">
                   <div className="font-medium text-foreground">Listening…</div>
                   <div className="text-[11px] text-muted-foreground tabular-nums">

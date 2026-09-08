@@ -41,7 +41,7 @@ export const StudioCreatedAcknowledgement = () => {
       className="mx-3 sm:mx-4 mt-3 rounded-lg border p-3 sm:p-4 flex items-center gap-3"
       style={{ borderColor: "hsl(var(--energy) / 0.3)", backgroundColor: "hsl(var(--energy) / 0.06)" }}
     >
-      <KretoPresence size="compact" state="success" />
+      <KretoPresence size="card" state="success" />
       <div className="min-w-0 flex-1">
         <p className="text-sm font-semibold">Your Studio is ready.</p>
         <p className="text-xs text-muted-foreground mt-0.5">
