@@ -48,7 +48,7 @@ export function TodayHeader({ firstName, subtitle, className }: TodayHeaderProps
             Kreto · Today
           </p>
           <h2 className="text-lg sm:text-xl font-black leading-tight text-foreground">
-            {firstName}, here&rsquo;s what moves you forward.
+            Let&rsquo;s move something today.
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">{line}</p>
 
