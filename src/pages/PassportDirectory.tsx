@@ -11,6 +11,7 @@ import { ShieldCheck, MapPin, Search as SearchIcon, Fingerprint } from "lucide-r
 import { BRAND } from "@/lib/brandLexicon";
 import { StaggerHeading } from "@/components/typography/StaggerReveal";
 import { APP_URL } from "@/lib/constants";
+import { passportId } from "@/lib/passportId";
 
 interface PassportRow {
   user_id: string | null;
@@ -23,8 +24,7 @@ interface PassportRow {
   level: number | null;
 }
 
-const passportIdFor = (userId: string) =>
-  `THR-${userId.replace(/-/g, "").slice(0, 5).toUpperCase()}`;
+const passportIdFor = (userId: string) => passportId(userId);
 
 const PassportDirectory = () => {
   const [rows, setRows] = useState<PassportRow[]>([]);
