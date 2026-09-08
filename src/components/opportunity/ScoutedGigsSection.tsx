@@ -22,6 +22,8 @@ import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { KretoMark } from "@/components/brand/KretoMark";
 import { SmartWidget } from "@/components/ui/smart-widget";
 import { OpportunitiesFeed } from "@/components/circle/OpportunitiesFeed";
+import { ScoutedCard } from "./scout/ScoutedCard";
+import { inferScoutCategory, inferEngagement, inferSeniority } from "@/lib/scoutCategory";
 
 interface ScoutedGig {
   id: string;
@@ -387,7 +389,7 @@ export function ScoutedGigsSection({ limit }: ScoutedGigsSectionProps = {}) {
         <Carousel opts={{ align: "start", dragFree: true, duration: reducedMotion ? 0 : 20 }} className="w-full" aria-label="Scouted gigs">
           <CarouselContent className="-ml-3">
             {gigs.slice(0, limit).map((g) => (
-              <CarouselItem key={g.id} className="pl-3 basis-[85%] sm:basis-[60%]">
+              <CarouselItem key={g.id} className="pl-3 basis-[88%] sm:basis-[58%]">
                 {renderGigCard(g)}
               </CarouselItem>
             ))}
@@ -424,7 +426,7 @@ export function ScoutedGigsSection({ limit }: ScoutedGigsSectionProps = {}) {
             <Carousel setApi={setCarouselApi} opts={{ align: "start", dragFree: true, duration: reducedMotion ? 0 : 20 }} className="w-full" aria-label="More scouted gigs">
               <CarouselContent className="-ml-3">
                 {gigs.slice(1).map((g) => (
-                  <CarouselItem key={g.id} className="pl-3 basis-[85%] sm:basis-[46%] lg:basis-[31%]">
+                  <CarouselItem key={g.id} className="pl-3 basis-[88%] sm:basis-[52%] lg:basis-[34%]">
                     {renderGigCard(g)}
                   </CarouselItem>
                 ))}
