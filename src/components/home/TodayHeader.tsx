@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import { MessageCircle, PenLine } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { ThrivePresence } from "@/components/ThrivePresence";
 import { Button } from "@/components/ui/button";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
@@ -20,7 +19,6 @@ interface TodayHeaderProps {
  * Pure presentation: no data fetching lives here.
  */
 export function TodayHeader({ firstName, subtitle, className }: TodayHeaderProps) {
-  const navigate = useNavigate();
   const reducedMotion = useReducedMotion();
 
   const line =
@@ -58,7 +56,15 @@ export function TodayHeader({ firstName, subtitle, className }: TodayHeaderProps
             <Button
               size="sm"
               className="rounded-full gap-1.5"
-              onClick={() => navigate("/scout?draft=outreach")}
+              onClick={() =>
+                window.dispatchEvent(
+                  new CustomEvent("thrive-copilot:open", {
+                    detail: {
+                      prompt: "Draft a short outreach DM I can send today to a collaborator or client who fits my Passport.",
+                    },
+                  }),
+                )
+              }
             >
               <PenLine className="h-3.5 w-3.5" />
               Draft outreach
@@ -67,7 +73,9 @@ export function TodayHeader({ firstName, subtitle, className }: TodayHeaderProps
               size="sm"
               variant="outline"
               className="rounded-full gap-1.5"
-              onClick={() => navigate("/copilot")}
+              onClick={() =>
+                window.dispatchEvent(new CustomEvent("thrive-copilot:open", { detail: {} }))
+              }
             >
               <MessageCircle className="h-3.5 w-3.5" />
               Or just chat
