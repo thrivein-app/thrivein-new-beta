@@ -241,27 +241,19 @@ const ThriveDesk = () => {
   }
 
   return (
-    <DeskShell
-      mobileSidebarOpen={sidebarOpen}
-      onCloseMobileSidebar={() => setSidebarOpen(false)}
-      sidebar={
-        <DeskSidebar
-          projects={projects}
-          activeProjectId={projectId}
-          open={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          expanded={desktopSidebarOpen}
-          onExpand={() => setDesktopSidebarOpen(true)}
-          onProjectCreated={fetchProjects}
-        />
-      }
-    >
+    <DeskShell>
       <DeskWorkspace
         topbar={
           <DeskTopbar
-            onOpenMobileSidebar={() => setSidebarOpen(true)}
-            sidebarExpanded={desktopSidebarOpen}
-            onToggleSidebar={() => setDesktopSidebarOpen((v) => !v)}
+            leading={
+              <StudioSwitcher
+                projects={projects}
+                activeProjectId={projectId}
+                activeTitle={project.title}
+                onProjectCreated={fetchProjects}
+              />
+            }
+
             actions={
               <ProjectSettingsMenu
                 project={project}
