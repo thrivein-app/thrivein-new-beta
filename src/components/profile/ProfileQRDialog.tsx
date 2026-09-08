@@ -115,9 +115,6 @@ export const ProfileQRDialog = ({
 
             <div className="relative px-5 pb-5 pt-5">
               <div aria-hidden className="passport-qr-glow pointer-events-none absolute -inset-x-2 top-2 h-64 rounded-[32px] blur-2xl" />
-              <div aria-hidden className="pointer-events-none absolute inset-x-8 top-3 h-px overflow-hidden rounded-full">
-                <div className="holo-card-scan h-full w-1/3" />
-              </div>
               <div className="relative flex flex-col items-center">
                 <KretopiaQRCode id="profile-qr-code" value={connectUrl} ariaLabel={`QR code for ${userName}'s Creative Passport`} />
                 <p className="mt-3 text-center text-sm text-muted-foreground">Scan to open this Creative Passport</p>
