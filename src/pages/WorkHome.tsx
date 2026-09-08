@@ -63,10 +63,8 @@ import { PageTransition } from "@/components/PageTransition";
 import { SectionCard } from "@/components/ui/section-card";
 import { SoundStagesRail } from "@/components/circle/SoundStagesRail";
 import { SpeedTonightCard } from "@/components/home/SpeedTonightCard";
-import { CastingCallsRail } from "@/components/opportunity/CastingCallsRail";
-import { RecentRecordingsRail } from "@/components/calls/RecentRecordingsRail";
-import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
-import { CarouselPositionDots } from "@/components/ui/glass/CarouselPositionDots";
+import { CastingCollaboratorsSection } from "@/components/project/studio/CastingCollaboratorsSection";
+
 import { FeaturePageHeader } from "@/components/features/FeaturePageHeader";
 import { KretoTip } from "@/components/agent/KretoTip";
 import { STUDIO_TUTORIAL, STUDIO_BRAND_TUTORIAL } from "@/components/landing/kretopia/tutorialContent";
