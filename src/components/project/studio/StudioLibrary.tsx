@@ -2,17 +2,18 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNowStrict } from "date-fns";
 import {
-  Search, Plus, ChevronLeft, ChevronRight, Folder, Inbox, FolderInput,
-  ArrowUpRight, X, Loader2, AlertTriangle, Sparkles,
+  Search, Plus, ChevronLeft, ChevronRight, Folder, Inbox,
+  X, AlertTriangle, Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CtaButton } from "@/components/ui/cta-button";
 import { moodGradient, moodLabel } from "./moodGradient";
-import { monogram, STATUS_PILL, PAY_DOT, PAY_LABEL, type StudioProject } from "./studioCardHelpers";
+import { STATUS_PILL, PAY_DOT, PAY_LABEL, type StudioProject } from "./studioCardHelpers";
 import { MoveToFolderSheet } from "./MoveToFolderSheet";
 import { StudioFoldersBar, type StudioFolder } from "./StudioFoldersBar";
+import { YourWorkCard } from "./YourWorkCard";
 
 type PayState = "paid" | "invoiced" | "unsent";
 type StatusFilter = "all" | "active" | "needs_invoice" | "awaiting_payment" | "delivered";

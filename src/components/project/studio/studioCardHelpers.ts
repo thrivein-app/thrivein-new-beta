@@ -22,6 +22,7 @@ export interface StudioProject {
   id: string;
   title: string;
   status?: string | null;
+  workspace_type?: string | null;
   mood?: string | null;
   cover_url?: string | null;
   client_name?: string | null;
