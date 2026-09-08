@@ -5,7 +5,7 @@
  * the flex container, the mobile scrim, the sidebar wrapper, the topbar and
  * the workspace column were 200 lines of markup interleaved with data
  * fetching and tab state. Four components now own that chrome
- * (DeskShell / DeskSidebar / DeskTopbar / DeskWorkspace) so the page reads
+ * (DeskShell / StudioSwitcher / DeskTopbar / DeskWorkspace) so the page reads
  * as composition and every Desk surface inherits the same viewport maths,
  * the same safe-area clearance and the same scroll containment.
  */
