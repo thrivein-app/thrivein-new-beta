@@ -5,9 +5,10 @@ import { FolderKanban } from "lucide-react";
 import { ProjectSettingsMenu } from "@/components/project/ProjectSettingsMenu";
 import { SimpleProjectHeader } from "@/components/project/SimpleProjectHeader";
 import { DeskShell } from "@/components/project/desk/DeskShell";
-import { DeskSidebar } from "@/components/project/desk/DeskSidebar";
+import { StudioSwitcher } from "@/components/project/desk/StudioSwitcher";
 import { DeskTopbar } from "@/components/project/desk/DeskTopbar";
 import { DeskWorkspace } from "@/components/project/desk/DeskWorkspace";
+
 import { WorkspaceQuickPanel } from "@/components/project/WorkspaceQuickPanel";
 import { StudioToolBar } from "@/components/project/StudioToolBar";
 import { ConfirmCreditBanner } from "@/components/project/ConfirmCreditBanner";
@@ -38,14 +39,7 @@ const ThriveDesk = () => {
   } = useProjectData(projectId);
 
   const [activeTab, setActiveTab] = useState("today");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(() => {
-    if (typeof window === "undefined") return true;
-    return localStorage.getItem("thrivedesk:sidebar-open") !== "false";
-  });
-  useEffect(() => {
-    localStorage.setItem("thrivedesk:sidebar-open", String(desktopSidebarOpen));
-  }, [desktopSidebarOpen]);
+
   // Simplified default: the quick panel is a power-user affordance, opt-in
   // and remembered, rather than pushed at every user on first load.
   const [quickPanelOpen, setQuickPanelOpen] = useState(() => {
