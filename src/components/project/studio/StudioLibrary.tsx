@@ -333,10 +333,12 @@ export const StudioLibrary = ({
                         <span className="absolute left-3 top-3 grid h-9 w-9 place-items-center rounded-xl bg-black/25 text-xs font-black text-white ring-1 ring-white/25">
                           {monogram(p.title)}
                         </span>
-                        <span className={cn("absolute right-3 top-3 rounded-full px-2 py-0.5 text-[10px] font-bold", pill.tone)}>
+                        {/* Solid scrim, not the pill tint — on a mood
+                            cover a tinted pill can land tone-on-tone. */}
+                        <span className="absolute right-3 top-3 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white ring-1 ring-white/25">
                           {pill.label}
                         </span>
-                        <span className="absolute bottom-2 left-3 text-[10px] font-bold uppercase tracking-[0.14em] text-foreground/70">
+                        <span className="absolute bottom-2 left-3 text-[10px] font-bold uppercase tracking-[0.14em] text-foreground/75">
                           {moodLabel(p.mood)}
                         </span>
                       </span>
