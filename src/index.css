@@ -21,8 +21,8 @@ All colors MUST be HSL.
        repeating the stack literally. */
     --font-family-brand: 'Satoshi', 'Inter', ui-sans-serif, system-ui, sans-serif;
 
-    /* Warm cream #FAF8F5 — softer than pure white, editorial feel */
-    --background: 36 27% 97%;
+    /* Light mode — clean white canvas, ink text, Kretopia pink accent. */
+    --background: 0 0% 100%;
     --foreground: 240 11% 8%;
 
     --card: 0 0% 100%;
@@ -33,22 +33,22 @@ All colors MUST be HSL.
 
     /* Phase 2 ink-as-primary: structural color does buttons + links + highlights.
        Spectrum (pink/amber/teal) is RESERVED for the brand mark, loader and badges. */
-    --primary: 240 11% 8%;
-    --primary-foreground: 36 27% 97%;
+    --primary: 327 100% 40%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 36 18% 93%;
+    --secondary: 240 6% 96%;
     --secondary-foreground: 240 11% 12%;
 
-    --muted: 36 16% 94%;
-    --muted-foreground: 240 6% 42%;
+    --muted: 240 6% 96%;
+    --muted-foreground: 240 5% 38%;
 
     /* Warm cream alternate surface */
     --cream: 36 30% 95%;
     --cream-foreground: 240 11% 12%;
 
     /* Quiet ink-tinted hover/selected */
-    --accent: 36 22% 92%;
-    --accent-foreground: 240 11% 8%;
+    --accent: 327 100% 96%;
+    --accent-foreground: 327 100% 30%;
 
     /* Energy = Kretopia Magenta (primary highlight/CTA signal). */
     --energy: 327 100% 59%;
@@ -58,9 +58,9 @@ All colors MUST be HSL.
     --destructive-foreground: 0 0% 100%;
 
     /* Hairline borders — barely visible, more whitespace */
-    --border: 36 15% 88%;
-    --input: 36 15% 88%;
-    --ring: 240 11% 8%;
+    --border: 240 6% 89%;
+    --input: 240 6% 89%;
+    --ring: 327 100% 40%;
 
     --success: 152 55% 38%;
     --success-foreground: 0 0% 100%;
@@ -1392,3 +1392,31 @@ body:has(> [data-state="open"][role="dialog"]) .snap-receipt-fab {
   .btn-landing-primary:hover { transform: none; }
 }
 
+
+/* ============================================================
+   CRAFT STAMP — golden seal on the Creative Passport.
+   Metallic silver-gold gradient, subtle shine, no cartoon glow.
+   ============================================================ */
+.craft-stamp {
+  background-image:
+    linear-gradient(145deg, #FFF3C4 0%, #E8C45C 26%, #B98B22 52%, #F6DC8E 74%, #A9791A 100%);
+  border: 1px solid rgba(120, 84, 12, 0.55);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.75),
+    inset 0 -2px 3px rgba(120, 84, 12, 0.35),
+    0 4px 12px -6px rgba(150, 110, 20, 0.55);
+}
+.craft-stamp__shine {
+  background-image: linear-gradient(115deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0) 42%);
+  opacity: 0.9;
+}
+
+/* Grey → pink field, same pairing as the landing hero CTA. Text on top
+   is always white — see .kreto-grey-pink usage in the Passport. */
+.kreto-grey-pink {
+  background-image: linear-gradient(135deg, hsl(240 6% 26%) 0%, hsl(327 45% 42%) 55%, hsl(var(--energy)) 100%);
+  color: #fff;
+}
+.kreto-grey-pink-soft {
+  background-image: linear-gradient(135deg, hsl(240 6% 26% / 0.18) 0%, hsl(var(--energy) / 0.22) 100%);
+}

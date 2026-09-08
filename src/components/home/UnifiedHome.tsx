@@ -203,10 +203,14 @@ export const UnifiedHome = () => {
       // not just themselves (profiles table RLS hides non-connected rows).
       let creatorsQuery = supabase
         .from("public_profiles_safe")
-        .select("user_id, full_name, avatar_url, role, verification_tier, location, professional_skills")
+        .select("user_id, full_name, avatar_url, role, verification_tier, verification_status, location, professional_skills, bio, username, onboarding_completed")
 
+        // Passport-only: no avatar / no craft / not onboarded = no Passport,
+        // so the person never shows up in "People for you".
         .not("avatar_url", "is", null)
         .not("full_name", "is", null)
+        .not("role", "is", null)
+        .eq("onboarding_completed", true)
         .order("created_at", { ascending: false })
         .limit(40);
       if (user) {

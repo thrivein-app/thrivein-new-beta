@@ -137,15 +137,17 @@
     <meta name="twitter:description" content="The Creative Economy OS. Build your Creative Passport, find opportunities, collaborate, and get paid." />
     <meta name="twitter:image" content="https://www.kretopia.com/og-image.png" />
     <script>
-      // V1: Midnight locked platform-wide. Vibe picker disabled until post-launch.
+      // Two modes only: Dark (midnight, default) and Light (daylight).
       (function () {
         try {
           var html = document.documentElement;
-          html.setAttribute("data-vibe", "midnight");
-          html.classList.add("dark");
-          html.style.colorScheme = "dark";
-          html.style.backgroundColor = "#0B0B10";
-          localStorage.setItem("ui_vibe", "midnight");
+          var stored = localStorage.getItem("ui_vibe");
+          var light = stored === "daylight";
+          html.setAttribute("data-vibe", light ? "daylight" : "midnight");
+          html.classList.toggle("dark", !light);
+          html.style.colorScheme = light ? "light" : "dark";
+          html.style.backgroundColor = light ? "#FFFFFF" : "#0B0B10";
+          localStorage.setItem("ui_vibe", light ? "daylight" : "midnight");
         } catch (_) {}
       })();
       // Browser tabs (not the installed app) must never be served a stale

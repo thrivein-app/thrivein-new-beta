@@ -7,6 +7,8 @@ import {
   Camera, PencilLine, MapPin, ShieldCheck, Share2, QrCode, FileDown, ArrowRight, Star, Gauge, Fingerprint,
 } from "lucide-react";
 import { HoloCard } from "./HoloCard";
+import { CraftStamp } from "./CraftStamp";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AvailabilityIndicator } from "@/components/profile/AvailabilityIndicator";
 import { TrustSignals } from "@/components/profile/TrustSignals";
 import { SocialStatsInline } from "@/components/profile/SocialStatsInline";
@@ -119,17 +121,23 @@ export function PassportHero({
               Add a cover image to make your Passport pop
             </div>
           )}
-          <Button
-            size="sm"
-            variant="secondary"
-            className="absolute top-2 right-2 h-7 text-xs gap-1 shadow-md opacity-90 hover:opacity-100"
-            onClick={onEdit}
-            aria-label="Edit Passport"
-          >
-            <PencilLine className="h-3 w-3" />
-            Edit Passport
-          </Button>
-          <div className="absolute top-2 left-2 px-2.5 py-1 bg-[hsl(var(--signal-teal))] text-black text-[10px] font-bold uppercase tracking-[0.15em] rounded-full">
+          <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="secondary"
+                  className="absolute top-2 right-2 h-9 w-9 rounded-full shadow-md opacity-90 hover:opacity-100 focus-visible:ring-2 focus-visible:ring-ring"
+                  onClick={onEdit}
+                  aria-label="Edit profile"
+                >
+                  <PencilLine className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="left">Edit profile</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <div className="kreto-grey-pink absolute top-2 left-2 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.15em] rounded-full shadow-sm">
             Creative Passport
           </div>
         </div>
@@ -166,17 +174,8 @@ export function PassportHero({
                 )}
               </Button>
             </div>
-            <Badge
-              variant="outline"
-              className={
-                isVerifiedPro
-                  ? "bg-[hsl(var(--signal-teal))]/15 text-[hsl(var(--signal-teal))] border-[hsl(var(--signal-teal))]/40 shrink-0"
-                  : "bg-muted text-muted-foreground border-border shrink-0"
-              }
-            >
-              <ShieldCheck className="h-3 w-3 mr-1" />
-              {isVerifiedPro ? `L${standing.level} ${standing.title}` : `L${standing.level}`}
-            </Badge>
+            {/* Craft stamp — replaces the old flat "L1" chip, same slot. */}
+            <CraftStamp profile={profile} caption={isVerifiedPro ? standing.title : undefined} />
           </div>
 
           {/* Name + roles + location */}
@@ -298,7 +297,7 @@ export function PassportHero({
             </div>
             <div className="h-1.5 rounded-full bg-muted overflow-hidden">
               <div
-                className="h-full rounded-full bg-[hsl(var(--signal-teal))] transition-all"
+                className="h-full rounded-full kreto-grey-pink transition-all"
                 style={{ width: `${Math.min(strength, 100)}%` }}
               />
             </div>
