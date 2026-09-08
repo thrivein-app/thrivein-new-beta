@@ -84,7 +84,7 @@ export const CallRecapSheet = ({ open, onOpenChange, transcriptId }: Props) => {
         supabase.from("call_action_items").select("*").eq("transcript_id", transcriptId).order("created_at"),
       ]);
       if (!mounted) return;
-      setT((tRow as Transcript) ?? null);
+      setT((tRow as unknown as Transcript) ?? null);
       setItems((aRows as ActionItem[]) ?? []);
       setLoading(false);
     };
