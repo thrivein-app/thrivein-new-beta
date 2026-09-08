@@ -508,32 +508,27 @@ export const UnifiedHome = () => {
             tutorial={{ featureKey: "today", label: "How Today works", steps: TODAY_TUTORIAL }}
           />
           <StudioFeatureShell>
+              <TodayHeader firstName={firstName} />
+
               <ThrivePromptHero firstName={firstName} />
 
-              <motion.div
-                initial={reducedMotion ? false : { opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={reducedMotion ? { duration: 0 } : { duration: 0.4, ease: [0.2, 0.65, 0.3, 0.95] }}
-              >
-                <TodayFocus />
-              </motion.div>
-
-              <motion.div
-                initial={reducedMotion ? false : { opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={reducedMotion ? { duration: 0 } : { duration: 0.4, delay: 0.08, ease: [0.2, 0.65, 0.3, 0.95] }}
-              >
-                <MoreFromToday peopleForYou={peopleForYouNode} profile={profile} profileFull={profileFull} myCredits={myCredits} />
-              </motion.div>
-
-              <motion.div
-                initial={reducedMotion ? false : { opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={reducedMotion ? { duration: 0 } : { duration: 0.4, delay: 0.16, ease: [0.2, 0.65, 0.3, 0.95] }}
-              >
+              <TodayDashboard>
                 <Momentum />
-              </motion.div>
+              </TodayDashboard>
+
+              <TodayWhatsNext
+                focus={<TodayFocus />}
+                more={
+                  <MoreFromToday
+                    peopleForYou={peopleForYouNode}
+                    profile={profile}
+                    profileFull={profileFull}
+                    myCredits={myCredits}
+                  />
+                }
+              />
           </StudioFeatureShell>
+
         </>
       )}
 
