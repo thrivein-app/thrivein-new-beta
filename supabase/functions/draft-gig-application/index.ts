@@ -30,7 +30,7 @@ serve(async (req) => {
     const { scouted_gig_id } = await req.json();
     const [{ data: gig }, { data: profile }] = await Promise.all([
       supabase.from("scouted_gigs")
-        .select("title, company, description, compensation, location, skills, fit_reason")
+        .select("title, company, description, full_description, compensation, location, skills, fit_reason, contact_email, source_name, source_url")
         .eq("id", scouted_gig_id).eq("target_user_id", user.id).maybeSingle(),
       supabase.from("profiles")
         .select("full_name, role, sub_roles, professional_skills, passion_skills, bio, location, username")
