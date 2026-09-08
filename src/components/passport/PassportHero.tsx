@@ -297,7 +297,7 @@ export function PassportHero({
             </div>
             <div className="h-1.5 rounded-full bg-muted overflow-hidden">
               <div
-                className="h-full rounded-full bg-[hsl(var(--signal-teal))] transition-all"
+                className="h-full rounded-full kreto-grey-pink transition-all"
                 style={{ width: `${Math.min(strength, 100)}%` }}
               />
             </div>
