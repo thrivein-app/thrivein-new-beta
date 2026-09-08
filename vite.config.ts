@@ -22,10 +22,41 @@ export default defineConfig(({ mode }) => {
   const generateStaticSocialPages = env.VITE_GENERATE_STATIC_SOCIAL_PAGES === "true";
   const analyzeBundle = process.env.ANALYZE === "true";
 
+  // Publish-build safety net. `.env` is git-ignored in this repo, so a deploy
+  // that builds from a clean checkout inlines `undefined` for the Supabase
+  // client config and the app dies at boot with "supabaseUrl is required"
+  // (black screen). These two values are public by design (the anon /
+  // publishable key is safe in the browser bundle; RLS is what protects data),
+  // so we inline them explicitly whenever the environment did not provide them.
+  const SUPABASE_URL_FALLBACK = "https://kwmcocsitwssrtzkdojh.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY_FALLBACK =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3bWNvY3NpdHdzc3J0emtkb2poIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkxNzA3MzYsImV4cCI6MjA3NDc0NjczNn0.ZiAk_MZuQkA0quxb7KABtlJ1cY1KUAyXw55OebmUT4c";
+  const SUPABASE_PROJECT_ID_FALLBACK = "kwmcocsitwssrtzkdojh";
+
+  const supabaseUrl = env.VITE_SUPABASE_URL || SUPABASE_URL_FALLBACK;
+  const supabasePublishableKey =
+    env.VITE_SUPABASE_PUBLISHABLE_KEY || SUPABASE_PUBLISHABLE_KEY_FALLBACK;
+  const supabaseProjectId = env.VITE_SUPABASE_PROJECT_ID || SUPABASE_PROJECT_ID_FALLBACK;
+
+  const envFallbackDefines: Record<string, string> = {};
+  if (!env.VITE_SUPABASE_URL) {
+    envFallbackDefines["import.meta.env.VITE_SUPABASE_URL"] = JSON.stringify(supabaseUrl);
+  }
+  if (!env.VITE_SUPABASE_PUBLISHABLE_KEY) {
+    envFallbackDefines["import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY"] =
+      JSON.stringify(supabasePublishableKey);
+  }
+  if (!env.VITE_SUPABASE_PROJECT_ID) {
+    envFallbackDefines["import.meta.env.VITE_SUPABASE_PROJECT_ID"] =
+      JSON.stringify(supabaseProjectId);
+  }
+
   return {
     define: {
       __BUILD_VERSION__: JSON.stringify(buildHash),
+      ...envFallbackDefines,
     },
+
     server: {
       host: "::",
       port: 8080,
