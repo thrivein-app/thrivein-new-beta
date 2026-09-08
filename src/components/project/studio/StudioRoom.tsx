@@ -31,7 +31,7 @@ import { MoneySection } from "./MoneySection";
 import { PeopleSection } from "./PeopleSection";
 import { AddCreditSection } from "./AddCreditSection";
 import { WrapProjectCard } from "./WrapProjectCard";
-import { CallHistorySection } from "./CallHistorySection";
+import { MeetingIntelligenceSection } from "./MeetingIntelligenceSection";
 import { MilestoneStrip } from "./MilestoneStrip";
 import { PadPreviewSection } from "./PadPreviewSection";
 // ThriveGenerateCard retired — folded into StudioOutcomeComposer.
@@ -305,7 +305,7 @@ export const StudioRoom = ({
       <PeopleSection collaborators={people} ownerUserId={project.created_by} currentUserId={currentUserId} isOwner={isOwner} projectId={project.id} onUpdated={onUpdated} onlineUserIds={onlineUserIds} onKnock={knock} />
       {collapsedWidget("Wrap the project", <WrapProjectCard project={project} tasks={tasks} collaborators={people} currentUserId={currentUserId} isOwner={isOwner} onUpdated={onUpdated} />, true)}
       {collapsedWidget("Add a credit", <AddCreditSection project={project} collaborators={people} />, true)}
-      {collapsedWidget("Call history", <CallHistorySection projectId={project.id} />, true)}
+      {collapsedWidget("Calls &amp; meetings", <MeetingIntelligenceSection projectId={project.id} projectTitle={project.title} people={people} />, true)}
     </div>
   );
 
@@ -331,7 +331,7 @@ export const StudioRoom = ({
       case "people": return wrap(<PeopleSection collaborators={people} ownerUserId={project.created_by} currentUserId={currentUserId} isOwner={isOwner} projectId={project.id} onUpdated={onUpdated} onlineUserIds={onlineUserIds} onKnock={knock} />);
       case "wrap": return collapsedWidget("Wrap the project", <WrapProjectCard project={project} tasks={tasks} collaborators={people} currentUserId={currentUserId} isOwner={isOwner} onUpdated={onUpdated} />);
       case "credit": return collapsedWidget("Add a credit", <AddCreditSection project={project} collaborators={people} />);
-      case "calls": return collapsedWidget("Call history", <CallHistorySection projectId={project.id} />);
+      case "calls": return collapsedWidget("Calls &amp; meetings", <MeetingIntelligenceSection projectId={project.id} projectTitle={project.title} people={people} />);
     }
   };
 
