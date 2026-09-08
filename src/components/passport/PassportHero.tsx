@@ -119,17 +119,23 @@ export function PassportHero({
               Add a cover image to make your Passport pop
             </div>
           )}
-          <Button
-            size="sm"
-            variant="secondary"
-            className="absolute top-2 right-2 h-7 text-xs gap-1 shadow-md opacity-90 hover:opacity-100"
-            onClick={onEdit}
-            aria-label="Edit Passport"
-          >
-            <PencilLine className="h-3 w-3" />
-            Edit Passport
-          </Button>
-          <div className="absolute top-2 left-2 px-2.5 py-1 bg-[hsl(var(--signal-teal))] text-black text-[10px] font-bold uppercase tracking-[0.15em] rounded-full">
+          <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="secondary"
+                  className="absolute top-2 right-2 h-9 w-9 rounded-full shadow-md opacity-90 hover:opacity-100 focus-visible:ring-2 focus-visible:ring-ring"
+                  onClick={onEdit}
+                  aria-label="Edit profile"
+                >
+                  <PencilLine className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="left">Edit profile</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <div className="kreto-grey-pink absolute top-2 left-2 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.15em] rounded-full shadow-sm">
             Creative Passport
           </div>
         </div>
