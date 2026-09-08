@@ -2,17 +2,18 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNowStrict } from "date-fns";
 import {
-  Search, Plus, ChevronLeft, ChevronRight, Folder, Inbox, FolderInput,
-  ArrowUpRight, X, Loader2, AlertTriangle, Sparkles,
+  Search, Plus, ChevronLeft, ChevronRight, Folder, Inbox,
+  X, AlertTriangle, Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CtaButton } from "@/components/ui/cta-button";
-import { moodGradient, moodLabel } from "./moodGradient";
-import { monogram, STATUS_PILL, PAY_DOT, PAY_LABEL, type StudioProject } from "./studioCardHelpers";
+import { moodGradient } from "./moodGradient";
+import { STATUS_PILL, PAY_DOT, PAY_LABEL, type StudioProject } from "./studioCardHelpers";
 import { MoveToFolderSheet } from "./MoveToFolderSheet";
 import { StudioFoldersBar, type StudioFolder } from "./StudioFoldersBar";
+import { YourWorkCard } from "./YourWorkCard";
 
 type PayState = "paid" | "invoiced" | "unsent";
 type StatusFilter = "all" | "active" | "needs_invoice" | "awaiting_payment" | "delivered";
@@ -308,77 +309,29 @@ export const StudioLibrary = ({
           </div>
         ) : (
           <>
-            <ul className="grid gap-3 sm:grid-cols-2">
+            <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {visible.map((p) => {
                 const pill = STATUS_PILL[p.status ?? "active"] ?? STATUS_PILL.planning;
                 const state = pay(p.id);
                 return (
-                  <li key={p.id} className="group relative">
-                    <button
-                      type="button"
-                      onClick={() => navigate(`/desk/${p.id}`)}
-                      className="w-full overflow-hidden rounded-2xl border border-border bg-background text-left transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                    >
-                      {/* Illustrated cover — real cover image when the
-                          project has one, otherwise its mood gradient. */}
-                      <span className="relative block h-20 overflow-hidden" style={{ background: moodGradient(p.mood) }}>
-                        {p.cover_url && (
-                          <img src={p.cover_url} alt="" loading="lazy" className="h-full w-full object-cover" />
-                        )}
-                        <span
-                          aria-hidden
-                          className="absolute inset-0"
-                          style={{ background: "linear-gradient(180deg, transparent 30%, hsl(var(--background)/0.85) 100%)" }}
-                        />
-                        <span className="absolute left-3 top-3 grid h-9 w-9 place-items-center rounded-xl bg-black/25 text-xs font-black text-white ring-1 ring-white/25">
-                          {monogram(p.title)}
-                        </span>
-                        {/* Solid scrim, not the pill tint — on a mood
-                            cover a tinted pill can land tone-on-tone. */}
-                        <span className="absolute right-3 top-3 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white ring-1 ring-white/25">
-                          {pill.label}
-                        </span>
-                        <span className="absolute bottom-2 left-3 text-[10px] font-bold uppercase tracking-[0.14em] text-foreground/75">
-                          {moodLabel(p.mood)}
-                        </span>
-                      </span>
-
-                      <span className="block p-3">
-                        <span className="block truncate text-sm font-bold">{p.title}</span>
-                        <span className="mt-0.5 block truncate text-xs text-muted-foreground">
-                          {p.client_name || p.description || "No client set"}
-                        </span>
-                        <span className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
-                          <span>{formatDistanceToNowStrict(new Date(p.updated_at))} ago</span>
-                          {moneyVisible(p.id) && (
-                            <span className="inline-flex items-center gap-1.5">
-                              <span className={cn("h-1.5 w-1.5 rounded-full", PAY_DOT[state])} aria-hidden />
-                              {PAY_LABEL[state]}
-                            </span>
-                          )}
-                        </span>
-                        <span className="mt-2 flex items-center gap-1 text-[11px] font-bold text-foreground">
-                          {nextAction(p)}
-                          <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
-                        </span>
-                      </span>
-                    </button>
-
-                    {onMoveToFolder && folders.length > 0 && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="absolute right-2 top-[5.5rem] h-8 w-8 opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100"
-                        aria-label={`Move ${p.title} to a folder`}
-                        onClick={() => setMoveTarget(p)}
-                      >
-                        <FolderInput className="h-4 w-4" />
-                      </Button>
-                    )}
+                  <li key={p.id}>
+                    <YourWorkCard
+                      project={p}
+                      statusLabel={pill.label}
+                      nextAction={nextAction(p)}
+                      metaLabel={moneyVisible(p.id) ? PAY_LABEL[state] : undefined}
+                      metaDotClassName={PAY_DOT[state]}
+                      onOpen={() => navigate(`/desk/${p.id}`)}
+                      onShare={() => {
+                        navigator.clipboard?.writeText(`${window.location.origin}/desk/${p.id}`).catch(() => {});
+                      }}
+                      onMove={onMoveToFolder && folders.length > 0 ? () => setMoveTarget(p) : undefined}
+                    />
                   </li>
                 );
               })}
             </ul>
+
 
             {(hidden > 0 || (expanded && !filtering)) && (
               <div className="mt-3 flex justify-center">
