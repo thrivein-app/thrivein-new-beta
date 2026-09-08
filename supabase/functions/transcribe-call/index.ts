@@ -277,9 +277,22 @@ serve(async (req) => {
         reason: string;
         confidence?: "high" | "medium" | "low";
       }>;
+      decisions?: string[];
+      next_steps?: Array<{
+        title: string;
+        owner?: string;
+        due_hint?: string;
+        priority?: "low" | "medium" | "high";
+      }>;
+      suggested_projects?: Array<{
+        name: string;
+        description: string;
+        suggested_members?: string[];
+      }>;
     };
 
-    // 4. Save transcript + summary + chapters + highlights + co-sign hints.
+    // 4. Save transcript + summary + chapters + highlights + co-sign hints
+    //    + Meeting Intelligence extras (decisions, next steps, new Studios).
     await admin
       .from("call_transcripts")
       .update({
@@ -289,6 +302,9 @@ serve(async (req) => {
         chapters: parsed.chapters ?? [],
         highlights: parsed.highlights ?? [],
         co_sign_suggestions: parsed.co_sign_suggestions ?? [],
+        decisions: parsed.decisions ?? [],
+        next_steps: parsed.next_steps ?? [],
+        suggested_projects: parsed.suggested_projects ?? [],
         status: "ready",
       })
       .eq("id", transcript_id);
