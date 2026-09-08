@@ -188,6 +188,45 @@ serve(async (req) => {
                     },
                   },
                 },
+                  decisions: {
+                    type: "array",
+                    description: "Clear decisions made on the call, in the words used. Empty if nothing was actually decided — never invent one.",
+                    items: { type: "string" },
+                  },
+                  next_steps: {
+                    type: "array",
+                    description: "3-6 concrete next steps the team should take after this call, ordered by urgency.",
+                    items: {
+                      type: "object",
+                      properties: {
+                        title: { type: "string", description: "Imperative next step (max ~90 chars)." },
+                        owner: { type: "string", description: "Who should own it, if stated." },
+                        due_hint: { type: "string", description: "Timing as said on the call." },
+                        priority: { type: "string", enum: ["low", "medium", "high"] },
+                      },
+                      required: ["title"],
+                      additionalProperties: false,
+                    },
+                  },
+                  suggested_projects: {
+                    type: "array",
+                    description: "New Studios (projects) worth spinning up because of this call — only when a distinct new body of work was discussed. Usually 0-2. Never suggest one for routine follow-ups.",
+                    items: {
+                      type: "object",
+                      properties: {
+                        name: { type: "string", description: "Short Studio name (max ~60 chars)." },
+                        description: { type: "string", description: "One-line description of the work." },
+                        suggested_members: {
+                          type: "array",
+                          description: "Names of people from the call who should be in it.",
+                          items: { type: "string" },
+                        },
+                      },
+                      required: ["name", "description"],
+                      additionalProperties: false,
+                    },
+                  },
+                },
                 required: ["transcript", "summary", "chapters", "action_items"],
                 additionalProperties: false,
               },
