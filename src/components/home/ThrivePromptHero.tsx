@@ -114,6 +114,18 @@ function detectDocIntent(prompt: string):
 
 
 /**
+ * A plain question ("how do I…", "what's the best…", anything ending in "?")
+ * never needs the intent router — it just needs an answer, fast. Anything
+ * that reads like a command ("create…", "find…", "draft…") still routes.
+ */
+function isQuestion(prompt: string): boolean {
+  const p = prompt.trim().toLowerCase();
+  if (/^(create|make|build|start|find|search|open|draft|write|send|invoice|plan)\b/.test(p)) return false;
+  if (p.endsWith("?")) return true;
+  return /^(how|what|why|when|where|who|which|can|should|is|are|do|does|explain|tell me|comment|pourquoi|quoi|quel|quelle|est-ce)\b/.test(p);
+}
+
+/**
  * ThrivePromptHero — the conversational entry point on Home.
  * Smart "For You" chips replace the static dropdown — driven by the user's
  * most recent active workspace and profile completeness.
