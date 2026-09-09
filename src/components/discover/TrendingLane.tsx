@@ -7,6 +7,8 @@ import { TrendingUp, ShieldCheck, Handshake, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import posterConnected from "@/assets/kretopia-poster-connected.jpg.asset.json";
 import posterFaster from "@/assets/kretopia-poster-faster.jpg.asset.json";
+import { CreditSpotlightModal } from "./CreditSpotlightModal";
+
 
 const POSTER_FALLBACKS = [posterConnected.url, posterFaster.url];
 
@@ -39,6 +41,9 @@ export const TrendingLane = () => {
   const [newCredits, setNewCredits] = useState<NewCredit[]>([]);
   const [loading, setLoading] = useState(true);
   const [failedThumbs, setFailedThumbs] = useState<Set<string>>(new Set());
+  const [spotlight, setSpotlight] = useState<NewCredit | null>(null);
+  const [spotlightIndex, setSpotlightIndex] = useState(0);
+
 
   useEffect(() => {
     let cancelled = false;
@@ -159,10 +164,14 @@ export const TrendingLane = () => {
         ) : (
           <div className="grid grid-cols-2 gap-3">
             {newCredits.map((cr, i) => (
-              <Link
+              <button
                 key={cr.id}
-                to={`/credit/${cr.id}`}
-                className="rounded-xl border border-border bg-card overflow-hidden hover:border-[hsl(var(--signal-teal))]/40 transition-colors"
+                type="button"
+                onClick={() => {
+                  setSpotlight(cr);
+                  setSpotlightIndex(i);
+                }}
+                className="text-left rounded-xl border border-border bg-card overflow-hidden hover:border-[hsl(var(--signal-teal))]/40 transition-colors"
               >
                 <div className="aspect-video bg-muted">
                   <img
@@ -181,8 +190,9 @@ export const TrendingLane = () => {
                   <p className="text-xs font-semibold truncate">{cr.project_name || "Untitled"}</p>
                   <p className="text-[11px] text-muted-foreground truncate">{cr.role || "Credit"}</p>
                 </div>
-              </Link>
+              </button>
             ))}
+
           </div>
         )}
       </section>
@@ -202,6 +212,14 @@ export const TrendingLane = () => {
           </Link>
         </CardContent>
       </Card>
+
+      <CreditSpotlightModal
+        credit={spotlight}
+        fallbackImage={POSTER_FALLBACKS[spotlightIndex % POSTER_FALLBACKS.length]}
+        open={!!spotlight}
+        onOpenChange={(o) => !o && setSpotlight(null)}
+      />
     </div>
+
   );
 };
