@@ -449,6 +449,12 @@ export function ThrivePromptHero({ firstName }: { firstName?: string } = {}) {
           )}
         </AnimatePresence>
       </div>
+
+      <KretoAnswerModal
+        open={!!answerPrompt}
+        onOpenChange={(o) => { if (!o) setAnswerPrompt(null); }}
+        prompt={answerPrompt}
+      />
     </section>
   );
 }
