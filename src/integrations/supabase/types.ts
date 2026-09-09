@@ -9225,12 +9225,77 @@ export type Database = {
           },
         ]
       }
+      magazine_article_comments: {
+        Row: {
+          article_id: string
+          content: string
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          article_id: string
+          content: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          article_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "magazine_article_comments_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "magazine_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      magazine_article_likes: {
+        Row: {
+          article_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          article_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          article_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "magazine_article_likes_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "magazine_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       magazine_articles: {
         Row: {
           author_avatar_url: string | null
           author_name: string
           author_user_id: string | null
           category: string
+          comment_count: number
           content: string
           cover_image_url: string | null
           cover_position_x: number
@@ -9240,6 +9305,7 @@ export type Database = {
           id: string
           is_featured: boolean | null
           is_published: boolean | null
+          like_count: number
           read_time_minutes: number | null
           slug: string | null
           subtitle: string | null
@@ -9253,6 +9319,7 @@ export type Database = {
           author_name?: string
           author_user_id?: string | null
           category?: string
+          comment_count?: number
           content: string
           cover_image_url?: string | null
           cover_position_x?: number
@@ -9262,6 +9329,7 @@ export type Database = {
           id?: string
           is_featured?: boolean | null
           is_published?: boolean | null
+          like_count?: number
           read_time_minutes?: number | null
           slug?: string | null
           subtitle?: string | null
@@ -9275,6 +9343,7 @@ export type Database = {
           author_name?: string
           author_user_id?: string | null
           category?: string
+          comment_count?: number
           content?: string
           cover_image_url?: string | null
           cover_position_x?: number
@@ -9284,6 +9353,7 @@ export type Database = {
           id?: string
           is_featured?: boolean | null
           is_published?: boolean | null
+          like_count?: number
           read_time_minutes?: number | null
           slug?: string | null
           subtitle?: string | null
