@@ -210,6 +210,14 @@ export const TrendingLane = () => {
           </Link>
         </CardContent>
       </Card>
+
+      <CreditSpotlightModal
+        credit={spotlight}
+        fallbackImage={POSTER_FALLBACKS[spotlightIndex % POSTER_FALLBACKS.length]}
+        open={!!spotlight}
+        onOpenChange={(o) => !o && setSpotlight(null)}
+      />
     </div>
+
   );
 };
