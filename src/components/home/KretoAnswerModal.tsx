@@ -44,7 +44,7 @@ export function KretoAnswerModal({ open, onOpenChange, prompt }: KretoAnswerModa
     setAnswer("");
     let acc = "";
     await streamCopilot({
-      messages: [...history, { role: "user", content: question }].slice(-8),
+      messages: [...history, { role: "user" as const, content: question }].slice(-8),
       surface: "home",
       onDelta: (d) => {
         acc += d;
