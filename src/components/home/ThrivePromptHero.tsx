@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import { normalizeIntents, type PrimaryIntent } from "@/lib/intents";
 import { KretoMark } from "@/components/brand/KretoMark";
+import { KretoAnswerModal } from "@/components/home/KretoAnswerModal";
 
 interface RouteResponse {
   intent: "create_workspace" | "find_people" | "find_gigs" | "outreach" | "profile_epk" | "summarize" | "chat";
@@ -132,6 +133,8 @@ export function ThrivePromptHero({ firstName }: { firstName?: string } = {}) {
   }>({ hasBio: true, hasAvatar: true, creditsCount: 3, connectionsCount: 5, intents: [] });
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  // Answers land in a centered modal on this surface — not the side drawer.
+  const [answerPrompt, setAnswerPrompt] = useState<string | null>(null);
 
   // Listen for external prompt fill (Recent Intents, suggestion chips elsewhere)
   useEffect(() => {
