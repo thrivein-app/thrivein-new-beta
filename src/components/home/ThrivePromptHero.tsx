@@ -221,6 +221,16 @@ export function ThrivePromptHero({ firstName }: { firstName?: string } = {}) {
         setText("");
         return;
       }
+      // Fast-path: a plain question goes straight to the centered answer
+      // modal and starts streaming immediately — no router round-trip.
+      if (isQuestion(prompt)) {
+        setAnswerPrompt(prompt);
+        setText("");
+        void (supabase as any).from("thrive_intent_logs").insert({
+          user_id: user.id, prompt, intent: "chat", routed_to: "answer_modal",
+        });
+        return;
+      }
       // Client-side safety timeout — if routing stalls, fall back to opening chat.
       const routePromise = supabase.functions.invoke<RouteResponse>("route-thrive-intent", {
         body: { prompt },
@@ -268,7 +278,8 @@ export function ThrivePromptHero({ firstName }: { firstName?: string } = {}) {
         case "outreach":
         case "summarize":
         case "chat":
-          window.dispatchEvent(new CustomEvent("thrive-copilot:open", { detail: { prompt } }));
+          // Centered, full-width answer on Today — never the side drawer.
+          setAnswerPrompt(prompt);
           break;
         case "profile_epk":
           toast({ title: data.preview || "Opening your Press Kit…" });
