@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import { normalizeIntents, type PrimaryIntent } from "@/lib/intents";
 import { KretoMark } from "@/components/brand/KretoMark";
+import { KretoAnswerModal } from "@/components/home/KretoAnswerModal";
 
 interface RouteResponse {
   intent: "create_workspace" | "find_people" | "find_gigs" | "outreach" | "profile_epk" | "summarize" | "chat";
@@ -113,6 +114,18 @@ function detectDocIntent(prompt: string):
 
 
 /**
+ * A plain question ("how do I…", "what's the best…", anything ending in "?")
+ * never needs the intent router — it just needs an answer, fast. Anything
+ * that reads like a command ("create…", "find…", "draft…") still routes.
+ */
+function isQuestion(prompt: string): boolean {
+  const p = prompt.trim().toLowerCase();
+  if (/^(create|make|build|start|find|search|open|draft|write|send|invoice|plan)\b/.test(p)) return false;
+  if (p.endsWith("?")) return true;
+  return /^(how|what|why|when|where|who|which|can|should|is|are|do|does|explain|tell me|comment|pourquoi|quoi|quel|quelle|est-ce)\b/.test(p);
+}
+
+/**
  * ThrivePromptHero — the conversational entry point on Home.
  * Smart "For You" chips replace the static dropdown — driven by the user's
  * most recent active workspace and profile completeness.
@@ -132,6 +145,8 @@ export function ThrivePromptHero({ firstName }: { firstName?: string } = {}) {
   }>({ hasBio: true, hasAvatar: true, creditsCount: 3, connectionsCount: 5, intents: [] });
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  // Answers land in a centered modal on this surface — not the side drawer.
+  const [answerPrompt, setAnswerPrompt] = useState<string | null>(null);
 
   // Listen for external prompt fill (Recent Intents, suggestion chips elsewhere)
   useEffect(() => {
@@ -218,6 +233,16 @@ export function ThrivePromptHero({ firstName }: { firstName?: string } = {}) {
         setText("");
         return;
       }
+      // Fast-path: a plain question goes straight to the centered answer
+      // modal and starts streaming immediately — no router round-trip.
+      if (isQuestion(prompt)) {
+        setAnswerPrompt(prompt);
+        setText("");
+        void (supabase as any).from("thrive_intent_logs").insert({
+          user_id: user.id, prompt, intent: "chat", routed_to: "answer_modal",
+        });
+        return;
+      }
       // Client-side safety timeout — if routing stalls, fall back to opening chat.
       const routePromise = supabase.functions.invoke<RouteResponse>("route-thrive-intent", {
         body: { prompt },
@@ -265,7 +290,8 @@ export function ThrivePromptHero({ firstName }: { firstName?: string } = {}) {
         case "outreach":
         case "summarize":
         case "chat":
-          window.dispatchEvent(new CustomEvent("thrive-copilot:open", { detail: { prompt } }));
+          // Centered, full-width answer on Today — never the side drawer.
+          setAnswerPrompt(prompt);
           break;
         case "profile_epk":
           toast({ title: data.preview || "Opening your Press Kit…" });
@@ -423,6 +449,12 @@ export function ThrivePromptHero({ firstName }: { firstName?: string } = {}) {
           )}
         </AnimatePresence>
       </div>
+
+      <KretoAnswerModal
+        open={!!answerPrompt}
+        onOpenChange={(o) => { if (!o) setAnswerPrompt(null); }}
+        prompt={answerPrompt}
+      />
     </section>
   );
 }
