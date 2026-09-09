@@ -39,6 +39,9 @@ export const TrendingLane = () => {
   const [newCredits, setNewCredits] = useState<NewCredit[]>([]);
   const [loading, setLoading] = useState(true);
   const [failedThumbs, setFailedThumbs] = useState<Set<string>>(new Set());
+  const [spotlight, setSpotlight] = useState<NewCredit | null>(null);
+  const [spotlightIndex, setSpotlightIndex] = useState(0);
+
 
   useEffect(() => {
     let cancelled = false;
