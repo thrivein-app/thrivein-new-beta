@@ -159,10 +159,14 @@ export const TrendingLane = () => {
         ) : (
           <div className="grid grid-cols-2 gap-3">
             {newCredits.map((cr, i) => (
-              <Link
+              <button
                 key={cr.id}
-                to={`/credit/${cr.id}`}
-                className="rounded-xl border border-border bg-card overflow-hidden hover:border-[hsl(var(--signal-teal))]/40 transition-colors"
+                type="button"
+                onClick={() => {
+                  setSpotlight(cr);
+                  setSpotlightIndex(i);
+                }}
+                className="text-left rounded-xl border border-border bg-card overflow-hidden hover:border-[hsl(var(--signal-teal))]/40 transition-colors"
               >
                 <div className="aspect-video bg-muted">
                   <img
@@ -181,8 +185,9 @@ export const TrendingLane = () => {
                   <p className="text-xs font-semibold truncate">{cr.project_name || "Untitled"}</p>
                   <p className="text-[11px] text-muted-foreground truncate">{cr.role || "Credit"}</p>
                 </div>
-              </Link>
+              </button>
             ))}
+
           </div>
         )}
       </section>
