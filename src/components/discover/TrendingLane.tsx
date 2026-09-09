@@ -7,6 +7,8 @@ import { TrendingUp, ShieldCheck, Handshake, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import posterConnected from "@/assets/kretopia-poster-connected.jpg.asset.json";
 import posterFaster from "@/assets/kretopia-poster-faster.jpg.asset.json";
+import { CreditSpotlightModal } from "./CreditSpotlightModal";
+
 
 const POSTER_FALLBACKS = [posterConnected.url, posterFaster.url];
 
