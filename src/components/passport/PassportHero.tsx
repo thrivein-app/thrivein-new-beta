@@ -7,7 +7,6 @@ import {
   Camera, PencilLine, MapPin, ShieldCheck, Share2, QrCode, FileDown, ArrowRight, Star, Gauge, Fingerprint,
 } from "lucide-react";
 import { HoloCard } from "./HoloCard";
-import { CraftStamp } from "./CraftStamp";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AvailabilityIndicator } from "@/components/profile/AvailabilityIndicator";
 import { TrustSignals } from "@/components/profile/TrustSignals";
@@ -174,8 +173,7 @@ export function PassportHero({
                 )}
               </Button>
             </div>
-            {/* Craft stamp — replaces the old flat "L1" chip, same slot. */}
-            <CraftStamp profile={profile} caption={isVerifiedPro ? standing.title : undefined} />
+            <div aria-hidden className="h-1" />
           </div>
 
           {/* Name + roles + location */}
