@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
-import { QRCodeSVG } from "qrcode.react";
-import { Copy, Check, Share2, Mail, MessageCircle, Globe, Lock, Linkedin, Twitter, Instagram, QrCode } from "lucide-react";
+import { Copy, Check, Share2, Mail, MessageCircle, ChevronDown, Link2 } from "lucide-react";
 import {
   GlassModal,
   GlassModalContent,
@@ -10,6 +9,7 @@ import {
   GlassModalTrigger,
 } from "@/components/ui/glass/GlassModal";
 import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/BrandLogo";
 import { toast } from "@/hooks/use-toast";
 import { getProfessionLayout } from "@/lib/passport/professionProfiles";
 import { targetsFor, type ShareTargetMeta } from "@/lib/passport/shareTargets";
@@ -40,8 +40,13 @@ export const PassportShareSheet = ({
 }: Props) => {
   const layout = useMemo(() => getProfessionLayout(profile), [profile]);
   const targets = useMemo(() => targetsFor(layout.shareTargets), [layout]);
+  const availableTargets = useMemo(
+    () => targets.filter((target) => !target.paidOnly || canPublishSite),
+    [canPublishSite, targets],
+  );
+  const [selectedId, setSelectedId] = useState<string>(availableTargets[0]?.id ?? "profile");
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [qrOpenId, setQrOpenId] = useState<string | null>(null);
+  const selectedTarget = availableTargets.find((target) => target.id === selectedId) ?? availableTargets[0];
 
   const copy = async (t: ShareTargetMeta, silent = false) => {
     try {
@@ -72,121 +77,119 @@ export const PassportShareSheet = ({
     void copy(t);
   };
 
-  const shareViaInstagram = async (t: ShareTargetMeta) => {
-    // Instagram has no web share-intent URL for arbitrary links — copy and
-    // guide the user, rather than fabricating a link that would silently fail.
-    const ok = await copy(t, true);
-    if (ok) {
-      toast({ title: "Link copied for Instagram", description: "Paste it into your bio or a Story." });
-    }
-  };
-
   const whatsapp = (t: ShareTargetMeta) =>
     `https://wa.me/?text=${encodeURIComponent(`${profile.full_name ?? "Passport"} — ${t.label}: ${t.href(userId)}`)}`;
   const email = (t: ShareTargetMeta) =>
-    `mailto:?subject=${encodeURIComponent(profile.full_name ?? "Creative Passport")}&body=${encodeURIComponent(t.href(userId))}`;
-  const linkedin = (t: ShareTargetMeta) =>
-    `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(t.href(userId))}`;
-  const twitter = (t: ShareTargetMeta) =>
-    `https://twitter.com/intent/tweet?url=${encodeURIComponent(t.href(userId))}&text=${encodeURIComponent(
-      profile.full_name ? `${profile.full_name} — ${t.label}` : t.label,
+    `mailto:?subject=${encodeURIComponent(`${profile.full_name ?? "Creative"} — ${t.shortLabel}`)}&body=${encodeURIComponent(
+      `Take a look at ${profile.full_name ?? "my"} ${t.label.toLowerCase()} on Kretopia:\n\n${t.href(userId)}`,
     )}`;
+
+  if (!selectedTarget) return null;
+
+  const shareActions = [
+    {
+      label: "Share anywhere",
+      description: "Apps & AirDrop",
+      icon: Share2,
+      onClick: () => nativeShare(selectedTarget),
+    },
+    {
+      label: "WhatsApp",
+      description: "Send directly",
+      icon: MessageCircle,
+      href: whatsapp(selectedTarget),
+    },
+    {
+      label: "Email",
+      description: "Personal message",
+      icon: Mail,
+      href: email(selectedTarget),
+    },
+    {
+      label: copiedId === selectedTarget.id ? "Copied" : "Copy link",
+      description: "Paste anywhere",
+      icon: copiedId === selectedTarget.id ? Check : Copy,
+      onClick: () => copy(selectedTarget),
+    },
+  ];
 
   return (
     <GlassModal open={defaultOpen} onOpenChange={onOpenChange}>
       {trigger && <GlassModalTrigger asChild>{trigger}</GlassModalTrigger>}
-      <GlassModalContent className="sm:max-w-md">
-        <GlassModalHeader>
-          <GlassModalTitle>Share your {layout.label}</GlassModalTitle>
-          <GlassModalDescription>{layout.tagline}</GlassModalDescription>
-        </GlassModalHeader>
+      <GlassModalContent className="overflow-hidden border-border bg-card p-0 sm:max-w-lg sm:p-0">
+        <div className="relative border-b border-border bg-muted/30 px-5 pb-5 pt-6 sm:px-7 sm:pb-6 sm:pt-7">
+          <div aria-hidden className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[hsl(var(--signal-pink))] via-[hsl(var(--signal-amber))] to-[hsl(var(--signal-teal))]" />
+          <BrandLogo size="md" className="mb-7" />
+          <GlassModalHeader className="space-y-2 text-left">
+            <GlassModalTitle className="text-2xl font-black leading-tight">
+              Share your {layout.label}
+            </GlassModalTitle>
+            <GlassModalDescription className="max-w-sm text-sm leading-relaxed">
+              Put your work, credits and creative identity in the right hands.
+            </GlassModalDescription>
+          </GlassModalHeader>
+        </div>
 
-        <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-0.5">
-          {targets.map((t) => {
-            const locked = t.paidOnly && !canPublishSite;
-            const qrOpen = qrOpenId === t.id;
-            return (
-              <div key={t.id} className="rounded-xl border border-border/60 bg-card p-3">
-                <div className="flex items-start gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted shrink-0">
-                    {locked ? <Lock className="h-4 w-4" /> : <Globe className="h-4 w-4" />}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <h4 className="text-sm font-semibold">{t.label}</h4>
-                      {t.paidOnly && (
-                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                          {canPublishSite ? "Paid" : "Upgrade"}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-0.5">{t.description}</p>
-                  </div>
-                </div>
+        <div className="space-y-5 px-5 pb-6 pt-5 sm:px-7 sm:pb-7">
+          <div className="space-y-2">
+            <label htmlFor="passport-share-target" className="text-xs font-semibold text-muted-foreground">
+              What are you sharing?
+            </label>
+            <div className="relative">
+              <select
+                id="passport-share-target"
+                value={selectedTarget.id}
+                onChange={(event) => setSelectedId(event.target.value)}
+                className="h-12 w-full appearance-none rounded-md border border-border bg-background px-4 pr-10 text-sm font-semibold text-foreground outline-none transition-colors hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                {availableTargets.map((target) => (
+                  <option key={target.id} value={target.id}>{target.label}</option>
+                ))}
+              </select>
+              <ChevronDown aria-hidden className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            </div>
+          </div>
 
-                {!locked ? (
-                  <>
-                    <div className="mt-3 flex flex-wrap gap-1.5">
-                      <Button size="icon" variant="default" onClick={() => nativeShare(t)} className="h-8 w-8" aria-label={`Share ${t.label}`}>
-                        <Share2 className="h-3.5 w-3.5" />
-                      </Button>
-                      <Button size="icon" variant="outline" onClick={() => copy(t)} className="h-8 w-8" aria-label={`Copy link to ${t.label}`}>
-                        {copiedId === t.id ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                      </Button>
-                      <a href={whatsapp(t)} target="_blank" rel="noreferrer" aria-label={`Share ${t.label} on WhatsApp`}>
-                        <Button size="icon" variant="outline" className="h-8 w-8" tabIndex={-1}>
-                          <MessageCircle className="h-3.5 w-3.5" />
-                        </Button>
-                      </a>
-                      <a href={linkedin(t)} target="_blank" rel="noreferrer" aria-label={`Share ${t.label} on LinkedIn`}>
-                        <Button size="icon" variant="outline" className="h-8 w-8" tabIndex={-1}>
-                          <Linkedin className="h-3.5 w-3.5" />
-                        </Button>
-                      </a>
-                      <a href={twitter(t)} target="_blank" rel="noreferrer" aria-label={`Share ${t.label} on X`}>
-                        <Button size="icon" variant="outline" className="h-8 w-8" tabIndex={-1}>
-                          <Twitter className="h-3.5 w-3.5" />
-                        </Button>
-                      </a>
-                      <Button size="icon" variant="outline" onClick={() => shareViaInstagram(t)} className="h-8 w-8" aria-label={`Copy link for Instagram — ${t.label}`}>
-                        <Instagram className="h-3.5 w-3.5" />
-                      </Button>
-                      <a href={email(t)} aria-label={`Share ${t.label} by email`}>
-                        <Button size="icon" variant="outline" className="h-8 w-8" tabIndex={-1}>
-                          <Mail className="h-3.5 w-3.5" />
-                        </Button>
-                      </a>
-                      <Button
-                        size="icon"
-                        variant={qrOpen ? "default" : "outline"}
-                        onClick={() => setQrOpenId(qrOpen ? null : t.id)}
-                        className="h-8 w-8"
-                        aria-label={`${qrOpen ? "Hide" : "Show"} QR code for ${t.label}`}
-                        aria-expanded={qrOpen}
-                      >
-                        <QrCode className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
+          <div className="flex items-center gap-3 rounded-md border border-border bg-muted/25 p-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground">
+              <Link2 className="h-4 w-4" aria-hidden />
+            </span>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-foreground">{selectedTarget.label}</p>
+              <p className="truncate text-xs text-muted-foreground">{selectedTarget.href(userId)}</p>
+            </div>
+          </div>
 
-                    {qrOpen && (
-                      <div className="mt-3 flex flex-col items-center gap-2 rounded-lg border border-border/60 bg-background p-3">
-                        <QRCodeSVG value={t.href(userId)} size={128} level="M" marginSize={2} title={`QR code for ${t.label}`} />
-                        <p className="text-[11px] text-muted-foreground text-center">Scan to open {t.shortLabel.toLowerCase()}</p>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="mt-3">
-                    <a href="/subscription">
-                      <Button size="sm" variant="default" className="h-8">
-                        Upgrade to publish
-                      </Button>
-                    </a>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+          <div className="grid grid-cols-4 gap-2" aria-label="Share options">
+            {shareActions.map((action) => {
+              const Icon = action.icon;
+              const content = (
+                <>
+                  <span className="flex h-11 w-11 items-center justify-center rounded-md border border-border bg-background transition-colors group-hover:border-primary/50 group-hover:bg-primary/10">
+                    <Icon className="h-5 w-5" aria-hidden />
+                  </span>
+                  <span className="text-[11px] font-semibold leading-tight">{action.label}</span>
+                  <span className="sr-only">{action.description}</span>
+                </>
+              );
+
+              return action.href ? (
+                <Button key={action.label} asChild variant="ghost" className="group h-auto min-w-0 flex-col gap-2 px-1 py-2 text-foreground">
+                  <a href={action.href} target={action.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" aria-label={`${action.label}: ${action.description}`}>
+                    {content}
+                  </a>
+                </Button>
+              ) : (
+                <Button key={action.label} variant="ghost" className="group h-auto min-w-0 flex-col gap-2 px-1 py-2 text-foreground" onClick={action.onClick} aria-label={`${action.label}: ${action.description}`}>
+                  {content}
+                </Button>
+              );
+            })}
+          </div>
+
+          <p className="text-center text-[11px] text-muted-foreground">
+            Powered by Kretopia · Your Creative Passport
+          </p>
         </div>
       </GlassModalContent>
     </GlassModal>
