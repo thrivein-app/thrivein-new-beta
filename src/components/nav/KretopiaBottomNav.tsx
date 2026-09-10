@@ -1,20 +1,21 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, BadgeCheck, Briefcase, LayoutGrid, UserSearch, Wallet } from "lucide-react";
+import { Sun, BadgeCheck, Compass, LayoutGrid, UserSearch, Wallet, Briefcase } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { memo, useEffect, useState } from "react";
 import { useAccountTone } from "@/hooks/useAccountTone";
 
 /**
- * Kretopia V1 bottom nav — Home · Passport · Opportunities · Studio.
+ * Responsive counterpart of the laptop navigation.
  *
- * Kreto is a persistent bar/FAB layer, NOT a nav tab.
+ * The order, labels, icons and selected state intentionally mirror Navbar:
+ * Today · Studio · Scout · Passport.
  * Company/business accounts keep their existing B2B nav unchanged.
  */
 const CREATIVE_ITEMS = [
-  { path: "/", icon: Home, label: "Home", hint: "Today, insights, and Kreto's brief" },
+  { path: "/", icon: Sun, label: "Today", hint: "Today — what to move forward" },
+  { path: "/desk", icon: LayoutGrid, label: "Studio", hint: "Projects, rooms, files, tasks" },
+  { path: "/scout", icon: Compass, label: "Scout", hint: "Scouted gigs matched to you" },
   { path: "/profile", icon: BadgeCheck, label: "Passport", hint: "Your verified creative identity" },
-  { path: "/opportunities", icon: Briefcase, label: "Scout", hint: "Scouted gigs matched to you" },
-  { path: "/desk", icon: LayoutGrid, label: "Studio", hint: "Projects, files, and collaborators" },
 ];
 
 const COMPANY_ITEMS = [
@@ -58,11 +59,12 @@ const KretopiaBottomNav = memo(() => {
 
   const isActive = (path: string) => {
     if (path === "/") return location.pathname === "/";
-    if (path === "/opportunities") {
+    if (path === "/scout") {
       return (
-        location.pathname.startsWith("/opportunities") ||
+        location.pathname.startsWith("/scout") ||
+        location.pathname === "/opportunities" ||
         location.pathname.startsWith("/opportunity") ||
-        location.pathname.startsWith("/scout")
+        location.pathname === "/discover"
       );
     }
     if (path === "/profile") {
@@ -80,12 +82,13 @@ const KretopiaBottomNav = memo(() => {
 
   return (
     <nav
+      data-bottom-nav
       className="fixed bottom-0 left-0 right-0 z-50 lg:hidden border-t border-border/60 bg-background"
       role="navigation"
       aria-label="Mobile navigation"
       style={{ paddingBottom: "max(env(safe-area-inset-bottom), 10px)" }}
     >
-      <div className="flex items-center justify-around px-1 py-1">
+      <div className="grid grid-cols-4 gap-1.5 px-2 py-2 sm:gap-2 sm:px-4">
         {items.map((item) => {
           const active = isActive(item.path);
           return (
@@ -96,22 +99,19 @@ const KretopiaBottomNav = memo(() => {
               aria-label={`${item.label} — ${item.hint}`}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "relative flex flex-col items-center justify-center gap-1 px-2 py-2 rounded-xl transition-all duration-200 flex-1 min-h-[48px]",
+                "flex min-w-0 items-center justify-center gap-1.5 rounded-lg border px-1.5 text-xs font-medium transition-colors min-h-[44px] sm:gap-2 sm:px-3 sm:text-sm",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                 "touch-manipulation select-none active:scale-95",
-                active ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                active
+                  ? "border-border bg-foreground/[0.04] text-foreground shadow-sm"
+                  : "border-transparent text-muted-foreground hover:border-border/70 hover:bg-foreground/[0.02] hover:text-foreground"
               )}
               style={{ WebkitTapHighlightColor: "transparent" }}
             >
-              <item.icon className={cn("h-5 w-5 transition-all duration-200", active && "scale-105")} />
-              <span className={cn("text-[10px] leading-tight", active ? "font-semibold" : "font-medium")}>
+              <item.icon className="h-[18px] w-[18px] shrink-0" strokeWidth={1.75} />
+              <span className="min-w-0 truncate">
                 {item.label}
               </span>
-              {active && (
-                <span
-                  className="absolute -top-px left-1/2 -translate-x-1/2 h-0.5 w-8 rounded-full"
-                  style={{ background: "var(--kretopia-sunset, hsl(327 100% 59%))" }}
-                />
-              )}
             </Link>
           );
         })}
