@@ -13,7 +13,6 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { useOnboarding } from "./hooks/useOnboarding";
 import Navbar from "./components/Navbar";
 import KretopiaBottomNav from "./components/nav/KretopiaBottomNav";
-import QuickActionFab from "./components/QuickActionFab";
 import { BrandLoader } from "./components/brand/BrandDots";
 
 import { ModeThemeSync } from "./components/ModeThemeSync";
@@ -287,7 +286,6 @@ const AppContent = () => {
       <PageViewTracker />
       {showNavbar && <Navbar user={user} />}
       {showBottomNav && <KretopiaBottomNav />}
-      {showBottomNav && <QuickActionFab />}
       <ThriveAgentFab />
       {showBottomNav && <KretoLauncher />}
       {showBottomNav && <ThriveBar />}
